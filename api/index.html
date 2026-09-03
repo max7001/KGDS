@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#121418">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Karma Espositori - WCAM</title>
+
+  <link rel="shortcut icon" type="image/png" href="assets/brand/favicon-16x16.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/camera.css">
+</head>
+<body class="app-body">
+
+  <!-- =========================================================================
+       VIEW 1: LOGIN SCREEN
+       ========================================================================= -->
+  <section id="viewLogin" class="view-screen active">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <div class="auth-brand">
+          <div class="brand-logo-container">
+            <img src="assets/brand/karma-logo.svg" alt="Karma Italiana" class="brand-logo">
+          </div>
+          <p class="auth-subtitle">Rilevazione fotografica e allestimento espositori</p>
+        </div>
+
+        <div id="loginErrorAlert" class="alert-error" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="8"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="loginErrorText">Credenziali non corrette.</span>
+        </div>
+
+        <form id="formLogin" class="auth-form" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label for="inputUsername">Nome Utente</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <input type="text" id="inputUsername" class="form-control" placeholder="Inserisci nome utente" required autocomplete="username" autofocus>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <div class="input-with-icon">
+              <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input type="password" id="inputPassword" class="form-control" placeholder="Inserisci password" required autocomplete="current-password">
+            </div>
+          </div>
+
+          <div class="form-row-remember">
+            <label class="checkbox-container">
+              <input type="checkbox" id="checkRemember" checked>
+              <span class="checkmark"></span>
+              <span class="label-text">Ricorda utente</span>
+            </label>
+          </div>
+
+          <button type="submit" id="btnLoginSubmit" class="btn-primary btn-block">
+            <span id="loginBtnText">Accedi al Sistema</span>
+            <div id="loginSpinner" class="spinner-inline" style="display: none;"></div>
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>&copy; 2026 Karma Italiana Srl &bull; WCAM <span class="app-version-val">v2.6</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       APP NAVIGATION HEADER (Visibile nelle viste autenticate)
+       ========================================================================= -->
+  <header id="appHeader" class="app-header" style="display: none;">
+    <div class="header-left">
+      <button type="button" id="btnBackNav" class="btn-nav-back" onclick="handleNavBack()" style="display: none;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span id="navBackText">Indietro</span>
+      </button>
+      <div class="header-brand-box">
+        <div class="brand-badge-dot"></div>
+        <span id="headerBrandTitle" class="brand-title">Karma WCAM</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="user-pill" title="Utente collegato">
+        <span id="userAvatarLetter" class="user-avatar">A</span>
+        <span id="userNameLabel" class="user-name">Agente</span>
+      </div>
+      <button type="button" class="btn-icon" title="Disconnetti" onclick="handleLogout()" aria-label="Logout">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       VIEW 2: CATENE (GROUPS)
+       ========================================================================= -->
+  <section id="viewGroups" class="view-screen">
+    <div class="main-container">
+      <div class="view-header-card">
+        <div class="header-card-row">
+          <div class="view-badge">Seleziona Catena</div>
+          <div class="header-action-symbols">
+            <!-- Simbolo "i": Istruzioni d'uso -->
+            <button type="button" class="btn-action-symbol info-symbol" title="Istruzioni all'uso dell'applicazione" onclick="openInstructionsModal()">
+              <span>i</span>
+            </button>
+            <!-- Simbolo Statistiche: Pagina statistiche generali -->
+            <button type="button" class="btn-action-symbol stats-symbol" title="Statistiche Generali" onclick="openStatsModal()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <h1 class="view-title">Catene Retail Assegnate</h1>
+      </div>
+
+      <div id="groupsList" class="cards-list"></div>
+
+      <!-- Footer Versione App -->
+      <footer class="app-version-footer">
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.6</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 3: PUNTI VENDITA (SHOPS)
+       ========================================================================= -->
+  <section id="viewShops" class="view-screen">
+    <div class="main-container">
+      <div class="view-header-card">
+        <div class="view-badge" id="currentGroupBadge">Catena</div>
+        <h1 class="view-title" id="currentGroupHeading">Punti Vendita</h1>
+      </div>
+
+      <!-- Barra ricerca e ordinamento -->
+      <div class="filter-controls-card">
+        <div class="search-box">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="shopSearchInput" class="search-input" placeholder="Cerca negozio per città o nome..." oninput="filterShops()">
+        </div>
+
+        <div class="sort-tabs">
+          <button type="button" class="sort-tab active" id="sortNameBtn" onclick="sortShops('name')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18H3M21 6H3M17 12H3"></path>
+            </svg>
+            Nome
+          </button>
+          <button type="button" class="sort-tab" id="sortDateBtn" onclick="sortShops('date')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Data Visita
+          </button>
+        </div>
+      </div>
+
+      <div id="shopsLoading" class="loading-box">
+        <div class="spinner-karma"></div>
+        <p>Caricamento punti vendita...</p>
+      </div>
+
+      <div id="shopsList" class="compact-shops-list"></div>
+
+      <!-- Footer Versione App -->
+      <footer class="app-version-footer">
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.6</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 4: ESPOSITORI (EXHIBITORS)
+       ========================================================================= -->
+  <section id="viewExhibitors" class="view-screen">
+    <div class="main-container">
+      <div class="pv-summary-card">
+        <div class="pv-meta-top" style="justify-content: flex-end;">
+          <button type="button" class="btn-stock-quick" onclick="openStockModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            Giacenza Prodotti
+          </button>
+        </div>
+
+        <h1 class="pv-heading" id="currentShopTitle">PV Verona BRUNO</h1>
+
+        <!-- Barra Avanzamento Espositori -->
+        <div class="progress-box">
+          <div class="progress-labels">
+            <span class="progress-text">Allestimento verificato</span>
+            <span class="progress-count" id="progressCountLabel"><strong>0</strong> di 0 (0%)</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFillBar" style="width: 0%;"></div>
+          </div>
+
+          <!-- Caselle di spunta "Cartellini" e "Riparazioni" (Appare SOLO dopo aver scattato tutte le foto) -->
+          <div id="visitVerificationBox" class="visit-verification-box" style="display: none;">
+            <div class="verification-title-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Fotografie completate! Spunta i controlli obbligatori:</span>
+            </div>
+
+            <div class="verification-checkboxes-row">
+              <label class="verification-checkbox-card" id="lblCartellini">
+                <input type="checkbox" id="chkCartellini" onchange="AppRouter.onChecklistChanged()">
+                <span class="custom-chk-box"></span>
+                <div class="chk-card-texts">
+                  <span class="chk-main-title">Cartellini</span>
+                  <span class="chk-sub-title">Prezzi ed etichette in ordine</span>
+                </div>
+              </label>
+
+              <label class="verification-checkbox-card" id="lblRiparazioni">
+                <input type="checkbox" id="chkRiparazioni" onchange="AppRouter.onChecklistChanged()">
+                <span class="custom-chk-box"></span>
+                <div class="chk-card-texts">
+                  <span class="chk-main-title">Riparazioni</span>
+                  <span class="chk-sub-title">Espositori verificati e integri</span>
+                </div>
+              </label>
+            </div>
+
+            <!-- Tasto per salvare la visita (appare SOLO se entrambi cliccati) -->
+            <div id="saveVisitBtnRow" class="save-visit-btn-row" style="display: none;">
+              <button type="button" class="btn-save-visit" onclick="AppRouter.handleSaveVisit()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>Salva Visita</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="exhibitorsLoading" class="loading-box">
+        <div class="spinner-karma"></div>
+        <p>Caricamento espositori dal punto vendita...</p>
+      </div>
+
+      <div id="exhibitorsList" class="compact-espositori-list"></div>
+
+      <!-- Footer Versione App -->
+      <footer class="app-version-footer">
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.6</span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       VIEW 5: CAMERA STUDIO & GHOST OVERLAY VIEWPORT
+       ========================================================================= -->
+  <section id="viewCamera" class="camera-viewport-container" style="display: none;">
+    <!-- Inputs per fotocamera nativa dello smartphone (100% compatibilità browser mobile) -->
+    <input type="file" id="cameraNativeFileInput" accept="image/*" capture="environment" class="sr-only" onchange="handleFileCapture(event)">
+    <input type="file" id="cameraGalleryFileInput" accept="image/*" class="sr-only" onchange="handleFileCapture(event)">
+
+    <!-- Top Bar Fotocamera (Posizionata in alto con tasto Indietro, nome negozio e 2 tasti azioni) -->
+    <header class="camera-top-bar">
+      <button type="button" class="cam-nav-btn" onclick="closeCamera()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Indietro</span>
+      </button>
+
+      <div class="cam-target-info">
+        <span class="cam-target-pv" id="cameraTargetPvLabel">PV Verona</span>
+        <h2 class="cam-target-name" id="cameraTargetExTitle">Staffe TV</h2>
+      </div>
+
+      <div class="cam-quick-actions">
+        <!-- Tasto Ghost Planigramma Live -->
+        <button type="button" id="btnLiveGhost" class="cam-icon-btn active-state" title="Sovrapponi Planigramma Guida" onclick="toggleLiveGhost()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </button>
+
+        <!-- Switch Fotocamera (Fronte/Retro) -->
+        <button type="button" id="btnSwitchCam" class="cam-icon-btn" title="Cambia Fotocamera" onclick="switchCameraFeed()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path>
+            <polyline points="16 2 21 7 16 12"></polyline>
+            <path d="M21 7H9"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Stream Video Live (se supportato da browser/HTTPS) -->
+    <video id="liveVideoFeed" playsinline autoplay muted class="camera-video-feed"></video>
+    <canvas id="cameraCanvasOffscreen" class="hidden-canvas"></canvas>
+
+    <!-- Box di Fallback per smartphone / browser HTTP -->
+    <div id="cameraFallbackBox" class="fallback-camera-box" style="display: none;" onclick="triggerCameraCapture()">
+      <div class="fallback-icon-ring">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+          <circle cx="12" cy="13" r="4"></circle>
+        </svg>
+      </div>
+      <h2>Fotocamera Pronta</h2>
+      <p>Tocca per aprire la fotocamera ad alta definizione del tuo smartphone.</p>
+      <button type="button" class="btn-activate-native" onclick="event.stopPropagation(); triggerCameraCapture()">
+        <span>Scatta con Smartphone</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Griglia dei terzi per inquadratura -->
+    <div id="gridOverlay" class="camera-grid-overlay visible">
+      <div class="grid-line grid-h1"></div>
+      <div class="grid-line grid-h2"></div>
+      <div class="grid-line grid-v1"></div>
+      <div class="grid-line grid-v2"></div>
+      <div class="grid-center-cross"></div>
+    </div>
+
+    <!-- Ghost Overlay Planigramma Live -->
+    <div id="ghostOverlayWrapper" class="ghost-overlay-wrapper" style="display: none;">
+      <img id="ghostOverlayImg" src="" alt="Planigramma Guida" class="ghost-image">
+    </div>
+
+    <!-- Slider Trasparenza Planigramma Live -->
+    <div id="liveGhostSliderBar" class="ghost-slider-container" style="display: none;">
+      <span class="slider-label">Guida Planigramma:</span>
+      <input type="range" id="liveGhostSlider" min="10" max="90" value="40" oninput="updateLiveGhostOpacity(this.value)">
+      <span id="liveGhostVal" class="slider-val">40%</span>
+    </div>
+
+    <!-- Guida inquadratura -->
+    <div class="framing-hint-pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span>Inquadra perpendicolarmente l'espositore</span>
+    </div>
+
+    <!-- Bottom Bar Fotocamera -->
+    <footer class="camera-bottom-bar">
+      <!-- Carica da Galleria -->
+      <button type="button" class="cam-bottom-btn" onclick="triggerGalleryCapture()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+        <span class="btn-subtext">Galleria</span>
+      </button>
+
+      <!-- Pulsante di Scatto Centrale -->
+      <div class="shutter-wrapper">
+        <button type="button" id="mainShutterBtn" class="shutter-button" onclick="performShutterClick()" aria-label="Scatta fotografia">
+          <div class="shutter-inner-ring"></div>
+        </button>
+      </div>
+
+      <!-- Vedi Allestimento Campione -->
+      <button type="button" class="cam-bottom-btn" onclick="showTargetSampleModal()">
+        <div class="ref-thumb-mini">
+          <img id="camTargetSampleThumb" src="" alt="Campione" class="ref-thumb-img">
+        </div>
+        <span class="btn-subtext">Campione</span>
+      </button>
+    </footer>
+  </section>
+
+  <!-- =========================================================================
+       STUDIO DI REVISIONE SCATTO & GHOST PLANIGRAMMA POST-SCATTO
+       ========================================================================= -->
+  <div id="reviewStudioScreen" class="review-viewport-container" style="display: none;">
+    <header class="review-top-bar">
+      <button type="button" class="review-action-btn" onclick="cancelReviewAndRetake()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+        <span>Riprova</span>
+      </button>
+
+      <span class="review-title">Verifica Allestimento</span>
+
+      <button type="button" class="review-action-btn primary" id="btnUploadPhotoFinal" onclick="submitFinalPhoto()">
+        <span>Conferma e Salva</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Visualizzatore a confronto con Planigramma sovrapposto -->
+    <div class="review-image-canvas-wrapper">
+      <div class="review-comparison-container">
+        <img id="reviewCapturedPhoto" src="" alt="Foto Acquisita" class="review-preview-img">
+        <img id="reviewGhostPlanigramma" src="" alt="Planigramma Riferimento" class="review-ghost-img" style="opacity: 0;">
+      </div>
+    </div>
+
+    <!-- Slider Trasparenza Planigramma Post-Scatto -->
+    <div class="review-slider-bar">
+      <span class="slider-text-label">Sovrapponi Planigramma:</span>
+      <input type="range" id="reviewGhostSlider" min="0" max="100" value="0" oninput="updateReviewGhostTransparency(this.value)">
+      <span id="reviewGhostVal" class="slider-val">0%</span>
+    </div>
+
+    <!-- Barra Strumenti Ritocco -->
+    <div class="review-toolbox">
+      <button type="button" class="tool-btn" onclick="rotateCapturedImage(90)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        <span>Ruota 90°</span>
+      </button>
+
+      <button type="button" class="tool-btn" id="btnAutoContrast" onclick="toggleAutoContrast()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+        </svg>
+        <span>Auto Contrasto</span>
+      </button>
+    </div>
+
+    <!-- Overlay Spinner Caricamento -->
+    <div id="uploadSpinnerOverlay" class="uploading-overlay" style="display: none;">
+      <div class="uploading-card">
+        <div class="spinner-karma"></div>
+        <h3>Salvataggio nel Database Karma...</h3>
+        <p>Ottimizzazione e trasmissione immagine in corso</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODALI DELL'APPLICAZIONE
+       ========================================================================= -->
+
+  <!-- Modal 1: Istruzioni all'uso dell'app -->
+  <div id="modalInstructionsView" class="modal-overlay" style="display: none;">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="instruction-header-symbol">i</div>
+          <div>
+            <h3 class="modal-title">Guida &amp; Istruzioni all'Uso</h3>
+            <p class="modal-subtext">WebApp WCAM 2.0 &bull; Karma Italiana</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeInstructionsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="instructions-content">
+          <div class="instruction-item">
+            <div class="instruction-num-badge">1</div>
+            <div class="instruction-text-block">
+              <h4>Selezione Catena e Punto Vendita</h4>
+              <p>Tocca la catena retail per visualizzare l'elenco dei negozi. Puoi ricercare rapidamente per nome città o ordinare per data dell'ultima visita.</p>
+            </div>
+          </div>
+          <div class="instruction-item">
+            <div class="instruction-num-badge">2</div>
+            <div class="instruction-text-block">
+              <h4>Verifica Espositori &amp; Planigrammi</h4>
+              <p>Prima di scattare, tocca <strong>Esposizione</strong> per visualizzare l'allestimento modello o <strong>Planigramma</strong> per consultare lo schema ufficiale dei prodotti.</p>
+            </div>
+          </div>
+          <div class="instruction-item">
+            <div class="instruction-num-badge">3</div>
+            <div class="instruction-text-block">
+              <h4>Scatto Fotografico &amp; Allineamento Ghost</h4>
+              <p>Scatta con il tuo smartphone o scegli dalla galleria. Nella revisione, muovi lo slider <strong>Sovrapponi Planigramma</strong> per confrontare l'allineamento dei prodotti prima di salvare!</p>
+            </div>
+          </div>
+          <div class="instruction-item">
+            <div class="instruction-num-badge">4</div>
+            <div class="instruction-text-block">
+              <h4>Giacenze di Magazzino &amp; Foto Articoli</h4>
+              <p>Tocca <strong>Giacenze</strong> per verificare le quantità di magazzino. Clicca su qualsiasi <strong>codice prodotto</strong> per vedere la foto ufficiale dell'articolo presa da karmaitaliana.it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" onclick="closeInstructionsModal()">Ho Capito</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Statistiche Generali -->
+  <div id="modalStatsView" class="modal-overlay" style="display: none;">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="stats-header-symbol">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Statistiche Generali</h3>
+            <p class="modal-subtext">Riepilogo visite e punti vendita per l'agente collegato</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeStatsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="stats-kpi-row stats-kpi-4">
+          <div class="kpi-card">
+            <span class="kpi-num" id="statsKpiGroups">0</span>
+            <span class="kpi-title">Catene Assegnate</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-num" id="statsKpiShops">0</span>
+            <span class="kpi-title">PV Totali</span>
+          </div>
+          <div class="kpi-card kpi-firebase">
+            <span class="kpi-num" id="statsKpiFirebaseVisits">0</span>
+            <span class="kpi-title">Visite Firebase</span>
+          </div>
+          <div class="kpi-card kpi-firebase">
+            <span class="kpi-num" id="statsKpiFirebasePhotos">0</span>
+            <span class="kpi-title">Foto Firebase</span>
+          </div>
+        </div>
+
+        <h4 class="stats-section-title">Riepilogo per Catena Retail</h4>
+        <div class="table-responsive" style="margin-bottom: 20px;">
+          <table class="stock-table">
+            <thead>
+              <tr>
+                <th>Catena</th>
+                <th class="text-center">Totale PV</th>
+                <th>Ultima Visita</th>
+              </tr>
+            </thead>
+            <tbody id="statsTableBody"></tbody>
+          </table>
+        </div>
+
+        <h4 class="stats-section-title">Ultimi Allestimenti Rilevati su Firebase</h4>
+        <div id="statsRecentInspectionsList" class="stats-recent-grid">
+          <p style="color:var(--text-muted); font-size:0.825rem; padding:8px;">Caricamento fotografie da Firebase...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeStatsModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Fotografia Prodotto da karmaitaliana.it -->
+  <div id="modalProductPhotoView" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="modalProductPhotoTitle">Codice Prodotto</h3>
+          <p class="modal-subtext">Immagine ufficiale catalogo karmaitaliana.it</p>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeProductPhotoModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="productPhotoLoading" class="loading-box" style="display: none;">
+          <div class="spinner-karma"></div>
+          <p>Ricerca fotografia su karmaitaliana.it...</p>
+        </div>
+        <div id="productPhotoContainer" class="guide-image-view" style="display: none;">
+          <img id="modalProductImgTag" src="" alt="Foto Prodotto" class="guide-img">
+        </div>
+        <div id="productPhotoNotFound" class="alert-photo-not-found" style="display: none;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+          </svg>
+          <p>Nessuna immagine disponibile per questo codice su karmaitaliana.it</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeProductPhotoModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Guida Allestimento & Planigramma -->
+  <div id="modalGuideView" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalGuideTitle" class="modal-title">Guida Allestimento</h3>
+        <button type="button" class="btn-close-modal" onclick="closeGuideModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="guide-image-view">
+          <img id="modalGuideImgTag" src="" alt="Riferimento" class="guide-img">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" onclick="closeGuideModal()">Ho Capito</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Giacenza Stock Magazzino (Senza Barcode, con link foto prodotto) -->
+  <div id="modalStockView" class="modal-overlay" style="display: none;">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">Giacenza Prodotti</h3>
+          <p class="modal-subtext" id="stockModalShopSubtitle">PV Verona</p>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeStockModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="search-box mb-3">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="stockFilterInput" class="search-input" placeholder="Cerca codice articolo..." oninput="filterStockTable()">
+        </div>
+        <div id="stockLoading" class="loading-box" style="display: none;">
+          <div class="spinner-karma"></div>
+          <p>Caricamento giacenze...</p>
+        </div>
+        <div class="table-responsive">
+          <table class="stock-table">
+            <thead>
+              <tr>
+                <th>Codice Prodotto <small style="color:var(--text-muted); font-weight:normal;">(tocca per foto)</small></th>
+                <th class="text-center">Giacenza</th>
+              </tr>
+            </thead>
+            <tbody id="stockTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeStockModal()">Chiudi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       SCRIPTS
+       ========================================================================= -->
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/camera.js"></script>
+  <script src="assets/js/editor.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail:', err));
+      });
+    }
+  </script>
+</body>
+</html>
