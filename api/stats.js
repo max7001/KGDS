@@ -31,9 +31,9 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const inspectionsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/inspections?pageSize=100&key=${FIREBASE_CONFIG.apiKey}`;
-    const visitsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/visits?pageSize=100&key=${FIREBASE_CONFIG.apiKey}`;
-    const shopVisitsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/shop_visits?pageSize=100&key=${FIREBASE_CONFIG.apiKey}`;
+    const inspectionsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/inspections?pageSize=300&key=${FIREBASE_CONFIG.apiKey}`;
+    const visitsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/visits?pageSize=300&key=${FIREBASE_CONFIG.apiKey}`;
+    const shopVisitsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/shop_visits?pageSize=300&key=${FIREBASE_CONFIG.apiKey}`;
 
     const [respInspections, respVisits, respShopVisits] = await Promise.all([
       httpsGet(inspectionsUrl).catch(() => ({ status: 500 })),
@@ -107,7 +107,9 @@ module.exports = async (req, res) => {
             groupId: f.groupId?.stringValue || '',
             date: f.date?.stringValue || '',
             timestamp: f.timestamp?.timestampValue || f.timestamp?.stringValue || '',
-            agent: f.agent?.stringValue || ''
+            agent: f.agent?.stringValue || '',
+            formattedDate: f.formattedDate?.stringValue || '',
+            averageDays: f.averageDays?.stringValue || ''
           };
         }
       });
@@ -145,6 +147,56 @@ module.exports = async (req, res) => {
       inspectionsByAgent[it.agent] = (inspectionsByAgent[it.agent] || 0) + 1;
     });
 
+    // 4. Carica dati e statistiche agenti
+    let agentsData = {};
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const agentsFile = path.join(__dirname, '..', 'data', 'agents_data.json');
+      if (fs.existsSync(agentsFile)) {
+        agentsData = JSON.parse(fs.readFileSync(agentsFile, 'utf8'));
+      }
+    } catch (e) {
+      console.warn("Impossibile caricare data/agents_data.json:", e);
+    }
+
+    // Arricchisci gli agenti con statistiche da Firebase
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const enrichedAgents = Object.values(agentsData).map(ag => {
+      const agVisits = visits.filter(v => (v.agent || '').toLowerCase() === (ag.login || '').toLowerCase());
+      const agInspections = inspections.filter(i => (i.agent || '').toLowerCase() === (ag.login || '').toLowerCase());
+
+      const enrichedShops = (ag.assignedShops || []).map(s => {
+        const fbVisit = shopVisits[String(s.id)];
+        let visitDate = fbVisit ? fbVisit.date : null;
+        let avgDays = 'Mai visitato';
+        if (visitDate) {
+          const vDate = new Date(visitDate + 'T00:00:00');
+          if (!isNaN(vDate.getTime())) {
+            const diffDays = Math.max(0, Math.floor((today - vDate) / (1000 * 60 * 60 * 24)));
+            avgDays = diffDays === 0 ? 'Oggi (0 gg)' : `${diffDays} gg`;
+          }
+        }
+        return {
+          ...s,
+          lastVisitDate: visitDate,
+          averageDays: avgDays,
+          hasVisit: !!visitDate
+        };
+      });
+
+      return {
+        ...ag,
+        visitsCount: agVisits.length,
+        photosCount: agInspections.length,
+        recentVisits: agVisits.slice(0, 5),
+        recentInspections: agInspections.slice(0, 5),
+        assignedShops: enrichedShops
+      };
+    });
+
     return res.status(200).json({
       totalInspections: inspections.length,
       totalVisits: visits.length,
@@ -153,7 +205,8 @@ module.exports = async (req, res) => {
       shopVisits,
       chainLastVisits,
       inspectionsByChain,
-      inspectionsByAgent
+      inspectionsByAgent,
+      agents: enrichedAgents
     });
 
   } catch (err) {

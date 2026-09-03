@@ -1,4 +1,4 @@
-# WebApp Karma Espositori (WCAM 2.7) - Edizione Vercel / Firebase
+# WebApp Karma Espositori (WCAM 2.8) - Edizione Vercel / Firebase
 
 Applicazione web progressiva (PWA / Mobile-First SPA) sviluppata per **Karma Italiana Srl** per la rilevazione fotografica e la verifica dell'allestimento espositori nei punti vendita da parte degli agenti.
 
@@ -14,11 +14,13 @@ Tutti i dati anagrafici e operativi rimangono agganciati al backend storico di *
 - Giacenze di Magazzino (Stock)
 - Autenticazione agenti
 
-### 2. Archiviazione Foto e Statistiche (Firebase Cloud)
-Tutte le fotografie acquisite e i dati statistici di monitoraggio vengono salvati in modo sicuro e permanente su **Firebase** (progetto `app-create-con-ai`):
-- **Fotografie Allestimenti**: archiviate nel cloud di Firebase
-- **Record Statistici**: salvati in tempo reale su **Cloud Firestore** nella collezione `inspections` (*agente, catena, punto vendita, data, ora, note, espositore*)
-- **Dashboard Statistiche**: consultabile in qualsiasi momento premendo il simbolo 📊
+### 2. Archiviazione Foto, Visite e Statistiche Esclusivamente su Firebase Cloud
+Tutte le fotografie acquisite, le visite completate e il tracciamento delle date di visita sono gestite in modo sicuro e permanente su **Firebase** (progetto `app-create-con-ai`):
+- **Date Ultima Visita**: archiviate e lette **esclusivamente da Firebase Cloud Firestore** (collezione `shop_visits`), garantendo assoluta precisione e calcolo dinamico dei giorni trascorsi.
+- **Fotografie Allestimenti**: archiviate nel cloud di Firebase.
+- **Record Statistici**: salvati in tempo reale su Firestore nella collezione `visits` e `inspections`.
+- **Dashboard Statistiche Generali**: consultabile premendo il simbolo 📊.
+- **Pannello AMMINISTRATORE (per utente `mborri`)**: riquadro dedicato con menu a tendina per supervisionare tutti i 22 agenti commerciali Karma, visualizzando catene abbinate, punti vendita, visite e foto per ciascun agente.
 
 ### 3. Sicurezza Totale delle Chiavi API
 > [!IMPORTANT]
@@ -84,4 +86,4 @@ Il server locale `test_server.py` implementa nativamente sia il proxy verso `kar
 
 ---
 
-&copy; 2026 Karma Italiana Srl &bull; WCAM 2.2
+&copy; 2026 Karma Italiana Srl &bull; WCAM 2.8

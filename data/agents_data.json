@@ -1,0 +1,1272 @@
+{
+  "fedi": {
+    "id": 99,
+    "fullName": "Andrea Fedi",
+    "login": "fedi",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "361",
+        "name": "Milano",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "389",
+        "name": "Comacchio",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "396",
+        "name": "Lugo",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "386",
+        "name": "Carpi",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "gamba": {
+    "id": 102,
+    "fullName": "Maurizio Gamba",
+    "login": "gamba",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "386",
+        "name": "Carpi",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "64",
+        "name": "CAMPOBASSO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "388",
+        "name": "RE Meridiana",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "359",
+        "name": "Treviso",
+        "chain": "BRUNO",
+        "groupId": "5"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "losito": {
+    "id": 108,
+    "fullName": "Pino De Tommaso",
+    "login": "losito",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "359",
+        "name": "Treviso",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "371",
+        "name": "Riccione",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "67",
+        "name": "MATERA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "79",
+        "name": "MANFREDONIA 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "miceli": {
+    "id": 110,
+    "fullName": "Marzio Miceli",
+    "login": "miceli",
+    "assignedChains": [
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "79",
+        "name": "MANFREDONIA 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "406",
+        "name": "Cesena 2",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "167",
+        "name": "SAN SEVERO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "375",
+        "name": "Ravenna",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "neri": {
+    "id": 112,
+    "fullName": "Luigi Neri",
+    "login": "neri",
+    "assignedChains": [
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "375",
+        "name": "Ravenna",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "65",
+        "name": "LANCIANO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "367",
+        "name": "Piacenza",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "369",
+        "name": "Imola",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "perrone": {
+    "id": 115,
+    "fullName": "William Perrone",
+    "login": "perrone",
+    "assignedChains": [
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "369",
+        "name": "Imola",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "373",
+        "name": "Modena",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "61",
+        "name": "MONOPOLI 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "393",
+        "name": "San G. in Persiceto",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "scazzetta": {
+    "id": 118,
+    "fullName": "Vito Scazzetta",
+    "login": "scazzetta",
+    "assignedChains": [
+      "BRUNO",
+      "EXPERT",
+      "UNIEURO"
+    ],
+    "assignedShops": [
+      {
+        "id": "393",
+        "name": "San G. in Persiceto",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "289",
+        "name": "Corato",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "404",
+        "name": "Cremona",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "358",
+        "name": "Mantova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "scuto": {
+    "id": 170,
+    "fullName": "Stefano Scuto",
+    "login": "scuto",
+    "assignedChains": [
+      "BRUNO",
+      "EXPERT",
+      "UNIEURO"
+    ],
+    "assignedShops": [
+      {
+        "id": "358",
+        "name": "Mantova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "71",
+        "name": "MOLFETTA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "78",
+        "name": "BARI 3",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "69",
+        "name": "POTENZA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "pratesi": {
+    "id": 176,
+    "fullName": "Massimiliano Pratesi",
+    "login": "pratesi",
+    "assignedChains": [
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "69",
+        "name": "POTENZA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "387",
+        "name": "San Lazzaro",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "383",
+        "name": "Sassuolo",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "400",
+        "name": "Modena Centro",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "AMDKARMA": {
+    "id": 179,
+    "fullName": "Petrillo Bordina",
+    "login": "AMDKARMA",
+    "assignedChains": [
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "400",
+        "name": "Modena Centro",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "398",
+        "name": "Fidenza",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "392",
+        "name": "RE Le vele",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "74",
+        "name": "FOGGIA 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "barracaracciolo": {
+    "id": 196,
+    "fullName": "Valerio Barra caracciolo",
+    "login": "barracaracciolo",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "74",
+        "name": "FOGGIA 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "356",
+        "name": "Chiuso --- Udine 2",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "360",
+        "name": "Lecco",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "370",
+        "name": "Ferrara",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "avr": {
+    "id": 202,
+    "fullName": "Stefano Piazza",
+    "login": "avr",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "370",
+        "name": "Ferrara",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "372",
+        "name": "Mirandola",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "56",
+        "name": "FOGGIA 1",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "364",
+        "name": "Bologna Michelino",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "trani": {
+    "id": 205,
+    "fullName": "Roberto Trani",
+    "login": "trani",
+    "assignedChains": [
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "364",
+        "name": "Bologna Michelino",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "365",
+        "name": "Budrio",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "68",
+        "name": "MARTINA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "290",
+        "name": "S.G. Teatino",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "losicco": {
+    "id": 207,
+    "fullName": "Innocenzo Lo Sicco",
+    "login": "losicco",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "290",
+        "name": "S.G. Teatino",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "376",
+        "name": "Casalecchio",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "352",
+        "name": "Mira",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "374",
+        "name": "Faenza",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "borghesi": {
+    "id": 213,
+    "fullName": "Gian Nicola Borghesi",
+    "login": "borghesi",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "374",
+        "name": "Faenza",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "60",
+        "name": "FRANCAVILLA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "354",
+        "name": "Padova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "395",
+        "name": "Castelguelfo",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "mytek": {
+    "id": 225,
+    "fullName": "ROBERTO SORGIA",
+    "login": "mytek",
+    "assignedChains": [
+      "COMET",
+      "EXPERT",
+      "UNIEURO"
+    ],
+    "assignedShops": [
+      {
+        "id": "395",
+        "name": "Castelguelfo",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "76",
+        "name": "ALTAMURA",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "62",
+        "name": "TERMOLI",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "304",
+        "name": "Maglie",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "faoro": {
+    "id": 229,
+    "fullName": "Luciano Faoro",
+    "login": "faoro",
+    "assignedChains": [
+      "COMET",
+      "EXPERT",
+      "UNIEURO"
+    ],
+    "assignedShops": [
+      {
+        "id": "304",
+        "name": "Maglie",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "307",
+        "name": "TRANI",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "405",
+        "name": "Rimini",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "368",
+        "name": "Forli",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "zenone": {
+    "id": 230,
+    "fullName": "Aldo Zenone",
+    "login": "zenone",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "368",
+        "name": "Forli",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "362",
+        "name": "Lodi",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "59",
+        "name": "MATINO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "366",
+        "name": "Mantova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "mkgroup": {
+    "id": 231,
+    "fullName": "Mirko Colica",
+    "login": "mkgroup",
+    "assignedChains": [
+      "BRUNO",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "366",
+        "name": "Mantova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "72",
+        "name": "MESAGNE",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "302",
+        "name": "Cepagatti",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "353",
+        "name": "Udine (T. nord)",
+        "chain": "BRUNO",
+        "groupId": "5"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "landi": {
+    "id": 282,
+    "fullName": "Luca Landi",
+    "login": "landi",
+    "assignedChains": [
+      "BRUNO",
+      "EXPERT",
+      "UNIEURO"
+    ],
+    "assignedShops": [
+      {
+        "id": "353",
+        "name": "Udine (T. nord)",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "58",
+        "name": "BARI 2",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "75",
+        "name": "MANFREDONIA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "77",
+        "name": "LECCE",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "crina": {
+    "id": 290,
+    "fullName": "GIUSEPPE CRINA",
+    "login": "crina",
+    "assignedChains": [
+      "BRUNO",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "77",
+        "name": "LECCE",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "351",
+        "name": "Vicenza",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "292",
+        "name": "Taranto 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "70",
+        "name": "TARANTO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "bianchin": {
+    "id": 291,
+    "fullName": "Claudio Bianchin",
+    "login": "bianchin",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "70",
+        "name": "TARANTO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "355",
+        "name": "Verona",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "407",
+        "name": "Bologna Centro",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "385",
+        "name": "Parma",
+        "chain": "COMET",
+        "groupId": "7"
+      }
+    ],
+    "assignedShopsCount": 4
+  },
+  "mborri": {
+    "id": 1,
+    "fullName": "Massimiliano Borri",
+    "login": "mborri",
+    "assignedChains": [
+      "BRUNO",
+      "COMET",
+      "UNIEURO",
+      "EXPERT"
+    ],
+    "assignedShops": [
+      {
+        "id": "76",
+        "name": "ALTAMURA",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "58",
+        "name": "BARI 2",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "78",
+        "name": "BARI 3",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "66",
+        "name": "BARLETTA",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "407",
+        "name": "Bologna Centro",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "364",
+        "name": "Bologna Michelino",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "365",
+        "name": "Budrio",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "64",
+        "name": "CAMPOBASSO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "386",
+        "name": "Carpi",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "376",
+        "name": "Casalecchio",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "395",
+        "name": "Castelguelfo",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "63",
+        "name": "CASTELLANA",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "302",
+        "name": "Cepagatti",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "73",
+        "name": "CERIGNOLA",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "384",
+        "name": "Cesena",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "406",
+        "name": "Cesena 2",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "356",
+        "name": "Chiuso --- Udine 2",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "303",
+        "name": "Civitanova",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "389",
+        "name": "Comacchio",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "289",
+        "name": "Corato",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "404",
+        "name": "Cremona",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "374",
+        "name": "Faenza",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "370",
+        "name": "Ferrara",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "398",
+        "name": "Fidenza",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "56",
+        "name": "FOGGIA 1",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "74",
+        "name": "FOGGIA 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "368",
+        "name": "Forli",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "60",
+        "name": "FRANCAVILLA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "301",
+        "name": "Francavilla",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "369",
+        "name": "Imola",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "65",
+        "name": "LANCIANO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "320",
+        "name": "L'aquila",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "77",
+        "name": "LECCE",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "360",
+        "name": "Lecco",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "362",
+        "name": "Lodi",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "57",
+        "name": "LUCERA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "396",
+        "name": "Lugo",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "304",
+        "name": "Maglie",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "75",
+        "name": "MANFREDONIA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "79",
+        "name": "MANFREDONIA 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "358",
+        "name": "Mantova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "366",
+        "name": "Mantova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "68",
+        "name": "MARTINA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "67",
+        "name": "MATERA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "59",
+        "name": "MATINO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "72",
+        "name": "MESAGNE",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "361",
+        "name": "Milano",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "352",
+        "name": "Mira",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "372",
+        "name": "Mirandola",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "373",
+        "name": "Modena",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "400",
+        "name": "Modena Centro",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "71",
+        "name": "MOLFETTA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "61",
+        "name": "MONOPOLI 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "354",
+        "name": "Padova",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "385",
+        "name": "Parma",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "367",
+        "name": "Piacenza",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "69",
+        "name": "POTENZA",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "375",
+        "name": "Ravenna",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "392",
+        "name": "RE Le vele",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "388",
+        "name": "RE Meridiana",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "371",
+        "name": "Riccione",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "405",
+        "name": "Rimini",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "290",
+        "name": "S.G. Teatino",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "393",
+        "name": "San G. in Persiceto",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "387",
+        "name": "San Lazzaro",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "167",
+        "name": "SAN SEVERO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "383",
+        "name": "Sassuolo",
+        "chain": "COMET",
+        "groupId": "7"
+      },
+      {
+        "id": "70",
+        "name": "TARANTO",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "292",
+        "name": "Taranto 2",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "62",
+        "name": "TERMOLI",
+        "chain": "EXPERT",
+        "groupId": "6"
+      },
+      {
+        "id": "307",
+        "name": "TRANI",
+        "chain": "UNIEURO",
+        "groupId": "4"
+      },
+      {
+        "id": "359",
+        "name": "Treviso",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "353",
+        "name": "Udine (T. nord)",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "355",
+        "name": "Verona",
+        "chain": "BRUNO",
+        "groupId": "5"
+      },
+      {
+        "id": "351",
+        "name": "Vicenza",
+        "chain": "BRUNO",
+        "groupId": "5"
+      }
+    ],
+    "assignedShopsCount": 75
+  }
+}

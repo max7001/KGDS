@@ -236,7 +236,7 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
 
         # 1. Recupera inspections
         try:
-            fs_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/inspections?pageSize=100&key={api_key}"
+            fs_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/inspections?pageSize=300&key={api_key}"
             req = urllib.request.Request(fs_url)
             with urllib.request.urlopen(req, timeout=10) as r:
                 data = json.loads(r.read().decode('utf-8'))
@@ -259,7 +259,7 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
 
         # 2. Recupera visits
         try:
-            visits_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/visits?pageSize=100&key={api_key}"
+            visits_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/visits?pageSize=300&key={api_key}"
             req_v = urllib.request.Request(visits_url)
             with urllib.request.urlopen(req_v, timeout=10) as r_v:
                 data_v = json.loads(r_v.read().decode('utf-8'))
@@ -282,7 +282,7 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
 
         # 3. Recupera shop_visits
         try:
-            sv_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/shop_visits?pageSize=100&key={api_key}"
+            sv_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/shop_visits?pageSize=300&key={api_key}"
             req_sv = urllib.request.Request(sv_url)
             with urllib.request.urlopen(req_sv, timeout=10) as r_sv:
                 data_sv = json.loads(r_sv.read().decode('utf-8'))
@@ -297,7 +297,9 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
                             'groupId': f.get('groupId', {}).get('stringValue', ''),
                             'date': f.get('date', {}).get('stringValue', ''),
                             'timestamp': f.get('timestamp', {}).get('timestampValue', ''),
-                            'agent': f.get('agent', {}).get('stringValue', '')
+                            'agent': f.get('agent', {}).get('stringValue', ''),
+                            'formattedDate': f.get('formattedDate', {}).get('stringValue', ''),
+                            'averageDays': f.get('averageDays', {}).get('stringValue', '')
                         }
         except Exception as ex:
             pass
@@ -334,6 +336,52 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
             by_chain[it['chain']] = by_chain.get(it['chain'], 0) + 1
             by_agent[it['agent']] = by_agent.get(it['agent'], 0) + 1
 
+        # 4. Carica dati agenti da data/agents_data.json
+        enriched_agents = []
+        try:
+            agents_file = os.path.join(BASE_DIR, 'data', 'agents_data.json')
+            if os.path.exists(agents_file):
+                with open(agents_file, 'r', encoding='utf-8') as af:
+                    agents_dict = json.load(af)
+                    from datetime import datetime
+                    today = datetime.now()
+
+                    for login, ag in agents_dict.items():
+                        ag_visits = [v for v in visits if v.get('agent', '').lower() == login.lower()]
+                        ag_inspections = [i for i in inspections if i.get('agent', '').lower() == login.lower()]
+
+                        enriched_shops = []
+                        for sh in ag.get('assignedShops', []):
+                            sid = str(sh.get('id'))
+                            fb_v = shop_visits.get(sid)
+                            v_date = fb_v.get('date') if fb_v else None
+                            avg_days = 'Mai visitato'
+                            if v_date:
+                                try:
+                                    vd = datetime.strptime(v_date, '%Y-%m-%d')
+                                    diff = max(0, (today - vd).days)
+                                    avg_days = 'Oggi (0 gg)' if diff == 0 else f"{diff} gg"
+                                except Exception:
+                                    pass
+
+                            enriched_shops.append({
+                                **sh,
+                                'lastVisitDate': v_date,
+                                'averageDays': avg_days,
+                                'hasVisit': bool(v_date)
+                            })
+
+                        enriched_agents.append({
+                            **ag,
+                            'visitsCount': len(ag_visits),
+                            'photosCount': len(ag_inspections),
+                            'recentVisits': ag_visits[:5],
+                            'recentInspections': ag_inspections[:5],
+                            'assignedShops': enriched_shops
+                        })
+        except Exception as ag_ex:
+            print("Errore caricamento agenti:", ag_ex)
+
         resp_body = json.dumps({
             'totalInspections': len(inspections),
             'totalVisits': len(visits),
@@ -342,7 +390,8 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
             'shopVisits': shop_visits,
             'chainLastVisits': chain_last_visits,
             'inspectionsByChain': by_chain,
-            'inspectionsByAgent': by_agent
+            'inspectionsByAgent': by_agent,
+            'agents': enriched_agents
         }).encode('utf-8')
 
         self.send_response(200)

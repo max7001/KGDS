@@ -938,3 +938,317 @@ body {
     align-items: center;
   }
 }
+
+/* ==========================================================================
+   RIQUADRO AMMINISTRATORE & SCHEDA STATISTICHE AGENTI (v2.8)
+   ========================================================================== */
+.admin-panel-card {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  color: #FFFFFF;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.admin-panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-shield-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #EF4444;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-panel-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #FFFFFF;
+}
+
+.admin-panel-subtitle {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+.admin-panel-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-panel-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #CBD5E1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.admin-select-input {
+  width: 100%;
+  appearance: none;
+  background: #FFFFFF;
+  color: #0F172A;
+  font-family: inherit;
+  font-size: 0.925rem;
+  font-weight: 600;
+  padding: 12px 42px 12px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #E2E8F0;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.admin-select-input:focus {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
+.admin-select-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #64748B;
+}
+
+/* Pulsante Indietro nella Scheda Agente */
+.btn-back-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: #1E293B;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-back-header:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+.admin-agent-pill {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Sezioni Dettaglio Agente */
+.admin-section-box {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  margin-top: 20px;
+  border: 1.5px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.admin-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0F172A;
+}
+
+.admin-section-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0;
+}
+
+.badge-pill-chain {
+  background: #E0E7FF;
+  color: #3730A3;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #DCFCE7;
+  color: #15803D;
+  font-size: 0.725rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.status-badge-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #FEF3C7;
+  color: #B45309;
+  font-size: 0.725rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+/* Timeline Attività Agente */
+.admin-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #F8FAFC;
+  border-radius: var(--radius-md);
+  border: 1px solid #E2E8F0;
+}
+
+.activity-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-icon-wrap.visit-icon {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.activity-icon-wrap.photo-icon {
+  background: #E0E7FF;
+  color: #4338CA;
+}
+
+.activity-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.activity-sub {
+  font-size: 0.775rem;
+  color: #64748B;
+}
+
+.activity-date {
+  font-size: 0.725rem;
+  color: #94A3B8;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.activity-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tag-pill-sm {
+  font-size: 0.675rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.tag-green {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.tag-blue {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+.activity-thumb-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid #CBD5E1;
+  flex-shrink: 0;
+}
+
+.activity-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

@@ -3,7 +3,7 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
-const APP_VERSION = 'v2.7';
+const APP_VERSION = 'v2.8';
 
 const AppRouter = (function() {
   let state = {
@@ -11,12 +11,14 @@ const AppRouter = (function() {
     currentUser: '',
     selectedGroup: null,
     selectedShop: null,
+    selectedAdminAgent: null,
     groups: [],
     shops: [],
     filteredShops: [],
     currentSort: 'name',
     exhibitors: [],
-    stockItems: []
+    stockItems: [],
+    agents: []
   };
 
   const views = {
@@ -24,7 +26,8 @@ const AppRouter = (function() {
     Groups: document.getElementById('viewGroups'),
     Shops: document.getElementById('viewShops'),
     Exhibitors: document.getElementById('viewExhibitors'),
-    Camera: document.getElementById('viewCamera')
+    Camera: document.getElementById('viewCamera'),
+    AdminAgentStats: document.getElementById('viewAdminAgentStats')
   };
 
   const appHeader = document.getElementById('appHeader');
@@ -96,6 +99,9 @@ const AppRouter = (function() {
       } else if (viewName === 'Exhibitors') {
         navBackText.textContent = 'Negozi';
         headerBrandTitle.textContent = state.selectedShop ? state.selectedShop.name : 'Espositori';
+      } else if (viewName === 'AdminAgentStats') {
+        navBackText.textContent = 'Catene';
+        headerBrandTitle.textContent = state.selectedAdminAgent ? `${state.selectedAdminAgent.fullName} (Statistiche)` : 'Statistiche Agente';
       } else {
         headerBrandTitle.textContent = 'Karma WCAM';
       }
@@ -162,6 +168,9 @@ const AppRouter = (function() {
       list.innerHTML = '<div class="loading-box"><div class="spinner-karma"></div><p>Caricamento catene dal database...</p></div>';
     }
 
+    // Configura e mostra il pannello AMMINISTRATORE se l'utente è mborri
+    checkAndSetupAdminPanel();
+
     try {
       const res = await KarmaAPI.getGroups();
 
@@ -188,6 +197,9 @@ const AppRouter = (function() {
         if (cv && cv.date) {
           g.lastVisitDate = KarmaAPI.formatItalianDate(cv.date);
           if (cv.shop) g.lastVisitShop = cv.shop;
+        } else {
+          g.lastVisitDate = '';
+          g.lastVisitShop = 'Nessuna visita registrata';
         }
       });
     } catch (e) {
@@ -196,6 +208,7 @@ const AppRouter = (function() {
   }
 
   // Sincronizza le date e ricalcola i giorni trascorsi dalla visita memorizzata su Firebase
+  // DA QUESTO MOMENTO UTILIZZA SOLO LE DATE DI FIREBASE
   async function syncShopsWithFirebaseVisits(shops) {
     try {
       const fbStats = await KarmaAPI.getFirebaseStats();
@@ -211,6 +224,7 @@ const AppRouter = (function() {
         if (v && v.date) {
           s.lastVisit = KarmaAPI.formatItalianDate(v.date);
           s.lastVisitRaw = v.date;
+          s.lastVisitSortKey = v.date;
 
           const vDate = new Date(v.date + 'T00:00:00');
           if (!isNaN(vDate.getTime())) {
@@ -218,6 +232,12 @@ const AppRouter = (function() {
             const diffDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
             s.averageDays = (diffDays === 0) ? 'Oggi (0 gg)' : `${diffDays} gg`;
           }
+        } else {
+          // Esclusivamente da Firebase: nessun dato HTML Karma
+          s.lastVisit = 'Mai visitato';
+          s.lastVisitRaw = '';
+          s.lastVisitSortKey = '1970-01-01';
+          s.averageDays = 'Mai visitato';
         }
       });
     } catch (e) {
@@ -861,12 +881,202 @@ const AppRouter = (function() {
     document.getElementById('modalStatsView').style.display = 'none';
   }
 
+  // =========================================================================
+  // GESTIONE AMMINISTRATORE (UTENTE mborri)
+  // =========================================================================
+  async function checkAndSetupAdminPanel() {
+    const adminPanel = document.getElementById('adminPanel');
+    const select = document.getElementById('adminAgentSelect');
+    if (!adminPanel || !select) return;
+
+    const user = (state.currentUser || localStorage.getItem('karma_logged_user') || '').toLowerCase().trim();
+    if (user === 'mborri') {
+      adminPanel.style.display = 'block';
+
+      try {
+        const agents = await KarmaAPI.getAgents();
+        state.agents = agents;
+
+        // Ordina alfabeticamente per nome completo
+        const sortedAgents = [...agents].sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+
+        select.innerHTML = '<option value="">-- Seleziona un agente per visualizzare le statistiche --</option>';
+        sortedAgents.forEach(a => {
+          const opt = document.createElement('option');
+          opt.value = a.login;
+          opt.textContent = `${a.fullName} (${a.login})`;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.warn("Errore popolamento selettore agenti:", err);
+      }
+    } else {
+      adminPanel.style.display = 'none';
+    }
+  }
+
+  function handleAdminAgentSelected(login) {
+    if (!login) return;
+    openAdminAgentStats(login);
+  }
+
+  async function openAdminAgentStats(login) {
+    let agent = (state.agents || []).find(a => (a.login || '').toLowerCase() === login.toLowerCase());
+    if (!agent) {
+      const agents = await KarmaAPI.getAgents();
+      state.agents = agents;
+      agent = agents.find(a => (a.login || '').toLowerCase() === login.toLowerCase());
+    }
+    if (!agent) return;
+
+    state.selectedAdminAgent = agent;
+    renderAdminAgentStats(agent);
+    navigateTo('AdminAgentStats');
+  }
+
+  function closeAdminAgentStats() {
+    const select = document.getElementById('adminAgentSelect');
+    if (select) select.value = '';
+    state.selectedAdminAgent = null;
+    navigateTo('Groups');
+  }
+
+  function renderAdminAgentStats(agent) {
+    if (!agent) return;
+
+    // Header info
+    const nameEl = document.getElementById('adminAgentStatsName');
+    const metaEl = document.getElementById('adminAgentStatsMeta');
+    if (nameEl) nameEl.textContent = agent.fullName || 'Agente';
+    if (metaEl) metaEl.textContent = `Username: ${agent.login || '-'} • ID Agente: ${agent.id || '-'}`;
+
+    // KPI
+    const chainsCount = (agent.assignedChains || []).length;
+    const shops = agent.assignedShops || [];
+    const visitsCount = agent.visitsCount || 0;
+    const photosCount = agent.photosCount || 0;
+
+    const elChains = document.getElementById('kpiAgentChains');
+    const elShops = document.getElementById('kpiAgentShops');
+    const elVisits = document.getElementById('kpiAgentVisits');
+    const elPhotos = document.getElementById('kpiAgentPhotos');
+    const elShopsBadge = document.getElementById('adminAgentShopsCount');
+
+    if (elChains) elChains.textContent = chainsCount;
+    if (elShops) elShops.textContent = shops.length;
+    if (elVisits) elVisits.textContent = visitsCount;
+    if (elPhotos) elPhotos.textContent = photosCount;
+    if (elShopsBadge) elShopsBadge.textContent = `${shops.length} PV`;
+
+    // Lista Punti Vendita dell'Agente
+    const shopsListEl = document.getElementById('adminAgentShopsList');
+    if (shopsListEl) {
+      shopsListEl.innerHTML = '';
+      if (shops.length === 0) {
+        shopsListEl.innerHTML = '<div class="loading-box"><p>Nessun punto vendita abbinato a questo agente.</p></div>';
+      } else {
+        shops.forEach(sh => {
+          const card = document.createElement('div');
+          card.className = 'compact-shop-card';
+
+          const formattedVisit = sh.lastVisitDate ? KarmaAPI.formatItalianDate(sh.lastVisitDate) : 'Mai visitato';
+          const avgDays = sh.averageDays || 'Mai visitato';
+          const isVisited = !!sh.lastVisitDate;
+
+          card.innerHTML = `
+            <div class="shop-title-row">
+              <span class="shop-name-bold">${escapeHtml(sh.name)}</span>
+              <span class="badge-pill-chain">${escapeHtml(sh.chain || 'Catena')}</span>
+            </div>
+            <div class="shop-meta-row">
+              <span class="shop-meta-item">Ultima visita: <strong>${escapeHtml(formattedVisit)}</strong></span>
+              <span class="shop-meta-item">&bull; Media: <strong>${escapeHtml(avgDays)}</strong></span>
+              ${isVisited ? '<span class="status-badge-verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Registrata</span>' : '<span class="status-badge-pending">Da visitare</span>'}
+            </div>
+            <div class="shop-buttons-row">
+              <button type="button" class="btn-shop-stock" onclick="event.stopPropagation(); AppRouter.openStockFor('${sh.groupId}', '${sh.id}', '${escapeHtml(sh.name)}')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                </svg>
+                Giacenze
+              </button>
+              <button type="button" class="btn-shop-exhibitors" onclick="AppRouter.selectShop('${sh.id}', '${escapeHtml(sh.name)}')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Esposizioni
+              </button>
+            </div>
+          `;
+          shopsListEl.appendChild(card);
+        });
+      }
+    }
+
+    // Lista Ultime Attività su Firebase per questo Agente
+    const actListEl = document.getElementById('adminAgentActivityList');
+    if (actListEl) {
+      actListEl.innerHTML = '';
+      const recentVisits = agent.recentVisits || [];
+      const recentPhotos = agent.recentInspections || [];
+
+      if (recentVisits.length === 0 && recentPhotos.length === 0) {
+        actListEl.innerHTML = '<div class="loading-box"><p>Nessuna attività registrata su Firebase da questo agente.</p></div>';
+      } else {
+        recentVisits.forEach(v => {
+          const item = document.createElement('div');
+          item.className = 'admin-activity-item';
+          item.innerHTML = `
+            <div class="activity-icon-wrap visit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div class="activity-info">
+              <div class="activity-title">Visita completata &bull; <strong>${escapeHtml(v.shop)}</strong> (${escapeHtml(v.chain)})</div>
+              <div class="activity-date">${escapeHtml(v.date ? KarmaAPI.formatItalianDate(v.date) : v.timestamp)}</div>
+              <div class="activity-tags">
+                ${v.cartellini ? '<span class="tag-pill-sm tag-green">Cartellini ✓</span>' : ''}
+                ${v.riparazioni ? '<span class="tag-pill-sm tag-blue">Riparazioni ✓</span>' : ''}
+              </div>
+            </div>
+          `;
+          actListEl.appendChild(item);
+        });
+
+        recentPhotos.forEach(p => {
+          const item = document.createElement('div');
+          item.className = 'admin-activity-item';
+          item.innerHTML = `
+            <div class="activity-icon-wrap photo-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </div>
+            <div class="activity-info">
+              <div class="activity-title">Foto conformità allestimento &bull; <strong>${escapeHtml(p.exTitle)}</strong></div>
+              <div class="activity-sub">${escapeHtml(p.shop)} (${escapeHtml(p.chain)})</div>
+              <div class="activity-date">${escapeHtml(p.date ? KarmaAPI.formatItalianDate(p.date) : p.timestamp)}</div>
+            </div>
+            ${p.photoUrl ? `
+              <div class="activity-thumb-box">
+                <img src="${p.photoUrl}" alt="Scatto" class="activity-thumb-img">
+              </div>
+            ` : ''}
+          `;
+          actListEl.appendChild(item);
+        });
+      }
+    }
+  }
+
   // NAVIGAZIONE INDIETRO
   function handleNavBack() {
     if (state.currentView === 'Exhibitors') {
       navigateTo('Shops');
     } else if (state.currentView === 'Shops') {
       navigateTo('Groups');
+    } else if (state.currentView === 'AdminAgentStats') {
+      closeAdminAgentStats();
     }
   }
 
@@ -911,6 +1121,8 @@ const AppRouter = (function() {
     returnToShop,
     onChecklistChanged,
     handleSaveVisit,
+    handleAdminAgentSelected,
+    closeAdminAgentStats,
     navigateTo,
     handleNavBack,
     handleLogout
@@ -947,6 +1159,8 @@ function closeStatsModal() { AppRouter.closeStats(); }
 function closeProductPhotoModal() { AppRouter.closeProductPhoto(); }
 function onVerificationCheckChange() { AppRouter.onChecklistChanged(); }
 function handleSaveVisit() { AppRouter.handleSaveVisit(); }
+function handleAdminAgentSelected(login) { AppRouter.handleAdminAgentSelected(login); }
+function closeAdminAgentStats() { AppRouter.closeAdminAgentStats(); }
 
 window.addEventListener('DOMContentLoaded', () => {
   AppRouter.init();

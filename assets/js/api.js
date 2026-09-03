@@ -113,24 +113,9 @@ const KarmaAPI = (function() {
       const titleEl = a.querySelector('h6');
       const name = titleEl ? titleEl.textContent.trim() : 'Catena';
 
-      const descEl = a.querySelector('p');
-      let lastVisitDate = '';
-      let lastVisitShop = '';
-      if (descEl) {
-        const bEl = descEl.querySelector('b');
-        let rawDate = '';
-        if (bEl && bEl.textContent.trim()) {
-          rawDate = bEl.textContent.trim();
-          lastVisitDate = formatItalianDate(rawDate);
-        }
-        // Estrai il nome del punto vendita (es. Mantova, Riccione, Udine)
-        const fullText = descEl.textContent.replace('Ultimo PV visitato:', '').trim();
-        if (rawDate) {
-          lastVisitShop = fullText.replace(rawDate, '').trim();
-        } else {
-          lastVisitShop = fullText;
-        }
-      }
+      // Le date di visita provengono ESCLUSIVAMENTE da Firebase Firestore
+      const lastVisitDate = '';
+      const lastVisitShop = '';
 
       const badgeEl = a.querySelector('.badge');
       const badgeText = badgeEl ? badgeEl.textContent.trim() : '';
@@ -222,33 +207,10 @@ const KarmaAPI = (function() {
       const titleEl = linkExhibitors.querySelector('.title, h6');
       const name = titleEl ? titleEl.textContent.trim() : 'Punto Vendita';
 
-      // Data ultima visita
-      let lastVisitFormatted = '';
-      let lastVisitSortKey = '';
-      const ps = linkExhibitors.querySelectorAll('p');
-      ps.forEach(p => {
-        if (p.textContent.includes('Ultima Visita:')) {
-          const cloneP = p.cloneNode(true);
-          cloneP.querySelectorAll('.duv, [hidden]').forEach(el => el.remove());
-          const cleanText = cloneP.textContent.replace(/Ultima Visita:/i, '').trim();
-          lastVisitFormatted = formatItalianDate(cleanText);
-          const match = cleanText.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
-          if (match) {
-            let y = parseInt(match[3], 10);
-            if (y < 100) y += 2000;
-            lastVisitSortKey = `${y}-${String(match[2]).padStart(2, '0')}-${String(match[1]).padStart(2, '0')}`;
-          }
-        }
-      });
-
-      // Media giorni
-      let averageDays = '';
-      ps.forEach(p => {
-        if (p.textContent.includes('Media')) {
-          const matchMedia = p.textContent.match(/Media\s*(\d+)/i);
-          if (matchMedia) averageDays = matchMedia[1] + ' gg';
-        }
-      });
+      // Le date di ultima visita provengono ESCLUSIVAMENTE da Firebase Firestore
+      const lastVisitFormatted = '';
+      const lastVisitSortKey = '';
+      const averageDays = '';
 
       // Link giacenze
       const linkStock = tr.querySelector('a[href*="shopstock.php"]');
@@ -447,6 +409,29 @@ const KarmaAPI = (function() {
     return true;
   }
 
+  // 10. RECUPERO DATI E STATISTICHE AGENTI (PER AMMINISTRATORE)
+  async function getAgents() {
+    try {
+      const stats = await getFirebaseStats();
+      if (stats && stats.agents && stats.agents.length > 0) {
+        return stats.agents;
+      }
+    } catch (e) {
+      console.warn("Impossibile recuperare agenti da /api/stats:", e);
+    }
+    // Fallback locale da data/agents_data.json
+    try {
+      const r = await fetch('/data/agents_data.json');
+      if (r.ok) {
+        const d = await r.json();
+        return Object.values(d);
+      }
+    } catch (e) {
+      console.warn("Fallback data/agents_data.json non riuscito:", e);
+    }
+    return [];
+  }
+
   return {
     login,
     getGroups,
@@ -457,6 +442,7 @@ const KarmaAPI = (function() {
     uploadPhoto,
     saveInspection,
     getFirebaseStats,
+    getAgents,
     formatItalianDate,
     logout
   };
