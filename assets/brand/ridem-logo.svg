@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="100%" height="100%">
+  <g transform="translate(5, 10)">
+    <text x="10" y="38" font-family="'Century Gothic', 'Montserrat', -apple-system, sans-serif" font-size="34" font-weight="700" letter-spacing="-0.5" fill="#1C1F26">rídem</text>
+    <!-- Red circle with slant -->
+    <circle cx="132" cy="26" r="14" fill="#E30613"/>
+    <path d="M 124 16 L 140 36 A 14 14 0 0 1 124 16 Z" fill="#FFFFFF"/>
+  </g>
+</svg>

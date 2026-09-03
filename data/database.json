@@ -1,0 +1,162 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "bruno",
+      "password": "password",
+      "name": "Bruno Merchandiser",
+      "role": "agent",
+      "assigned_pv": [
+        "pv-verona",
+        "pv-vicenza"
+      ]
+    },
+    {
+      "id": 2,
+      "username": "massimiliano",
+      "password": "karma",
+      "name": "Massimiliano",
+      "role": "admin",
+      "assigned_pv": [
+        "all"
+      ]
+    },
+    {
+      "id": 3,
+      "username": "admin",
+      "password": "admin",
+      "name": "Amministratore Karma",
+      "role": "admin",
+      "assigned_pv": [
+        "all"
+      ]
+    }
+  ],
+  "punti_vendita": [
+    {
+      "id": "pv-verona",
+      "code": "PV001",
+      "name": "PV Verona - BRUNO",
+      "city": "Verona (VR)",
+      "address": "Via del Lavoro 14",
+      "agent": "Bruno",
+      "espositori_ids": [
+        101,
+        102,
+        103,
+        104
+      ]
+    },
+    {
+      "id": "pv-milano",
+      "code": "PV002",
+      "name": "PV Milano Centro - MW",
+      "city": "Milano (MI)",
+      "address": "Corso Buenos Aires 33",
+      "agent": "Bruno",
+      "espositori_ids": [
+        101,
+        103,
+        105
+      ]
+    },
+    {
+      "id": "pv-bologna",
+      "code": "PV003",
+      "name": "PV Bologna - EURONICS",
+      "city": "Casalecchio di Reno (BO)",
+      "address": "Via De' Carracci 8",
+      "agent": "Bruno",
+      "espositori_ids": [
+        102,
+        103,
+        104,
+        105
+      ]
+    },
+    {
+      "id": "pv-roma",
+      "code": "PV004",
+      "name": "PV Roma Est - UNIEURO",
+      "city": "Roma (RM)",
+      "address": "Via Collatina km 12.8",
+      "agent": "Marco",
+      "espositori_ids": [
+        101,
+        102,
+        103
+      ]
+    }
+  ],
+  "espositori": [
+    {
+      "id": 101,
+      "title": "Staffe TV",
+      "subtitle": "Metro lineare",
+      "category": "Supporti TV & Audio",
+      "planigramma_img": "assets/images/planigramma.jpg",
+      "target_img": "assets/images/esposizione.jpg",
+      "notes": "Espositore standard staffe orientabili ed ultra-slim."
+    },
+    {
+      "id": 102,
+      "title": "Monitor",
+      "subtitle": "Metro lineare",
+      "category": "Informatica & Video",
+      "planigramma_img": "assets/images/planigramma.jpg",
+      "target_img": "assets/images/esposizione.jpg",
+      "notes": "Linee monitor e accessori da scrivania."
+    },
+    {
+      "id": 103,
+      "title": "Telecomandi Rídem",
+      "subtitle": "Espositore Stand Floor",
+      "category": "Telecomandi & Domotica",
+      "planigramma_img": "assets/images/planigramma.jpg",
+      "target_img": "assets/images/esposizione.jpg",
+      "notes": "Espositore a ganci per telecomandi sostitutivi ed universali."
+    },
+    {
+      "id": 104,
+      "title": "Cavi & Connettività",
+      "subtitle": "Metro lineare",
+      "category": "Accessori Audio/Video",
+      "planigramma_img": "assets/images/planigramma.jpg",
+      "target_img": "assets/images/esposizione.jpg",
+      "notes": "Cavi HDMI 4K/8K, cavi ottici, adattatori USB-C."
+    },
+    {
+      "id": 105,
+      "title": "Audio & Speaker",
+      "subtitle": "Isola promozionale",
+      "category": "Audio & Party",
+      "planigramma_img": "assets/images/planigramma.jpg",
+      "target_img": "assets/images/esposizione.jpg",
+      "notes": "Casse amplificate Karma con microfoni e luci party."
+    }
+  ],
+  "scatti": [
+    {
+      "id": "0A10192B-D422-4DA1-B185-E35CAD79B0A8",
+      "pv_id": "pv-verona",
+      "espositore_id": 101,
+      "filename": "0A10192B-D422-4DA1-B185-E35CAD79B0A8.jpeg",
+      "filepath": "assets/images/foto-effettuata.jpg",
+      "timestamp": "2026-08-28 14:35:10",
+      "uploaded_by": "bruno",
+      "status": "approved",
+      "notes": "Allestimento completato con cartellini prezzo aggiornati."
+    },
+    {
+      "id": "A460F9D3-690C-4E65-A2F4-97AB171D41B6",
+      "pv_id": "pv-verona",
+      "espositore_id": 103,
+      "filename": "A460F9D3-690C-4E65-A2F4-97AB171D41B6.jpeg",
+      "filepath": "upload/A460F9D3-690C-4E65-A2F4-97AB171D41B6.jpeg",
+      "timestamp": "2026-09-03 10:57:15",
+      "uploaded_by": "agente",
+      "status": "approved",
+      "notes": "Allestimento telecomandi ridem completato da test"
+    }
+  ]
+}

@@ -1,0 +1,607 @@
+/* ==========================================================================
+   WebApp Karma - Espositori (WCAM 2.0)
+   Full-Screen Professional Camera & Review Viewport Stylesheet
+   ========================================================================== */
+
+.camera-page {
+  background-color: #000000;
+  color: #FFFFFF;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.camera-viewport-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #000000;
+  overflow: hidden;
+}
+
+/* Video Live Stream */
+.camera-video-feed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* Box di Fallback per Utenti Esterni su browser mobile / HTTP */
+.fallback-camera-box {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 24px;
+  text-align: center;
+  background: radial-gradient(circle at 50% 40%, #1E222A 0%, #0A0C0E 100%);
+  cursor: pointer;
+}
+
+.fallback-icon-ring {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(227, 6, 19, 0.12);
+  border: 2px dashed rgba(227, 6, 19, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin-bottom: 20px;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 6, 19, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 0 24px rgba(227, 6, 19, 0.4); }
+}
+
+.fallback-camera-box h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.fallback-camera-box p {
+  font-size: 0.875rem;
+  color: #94A3B8;
+  max-width: 320px;
+  line-height: 1.45;
+  margin-bottom: 24px;
+}
+
+.btn-activate-native {
+  background: linear-gradient(135deg, #FF2A38 0%, #E30613 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 14px 28px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px var(--primary-glow);
+  transition: var(--transition);
+}
+
+.btn-activate-native:hover, .btn-activate-native:active {
+  transform: scale(1.03);
+}
+
+.hidden-canvas {
+  display: none;
+}
+
+/* Griglia dei terzi / Allineamento */
+.camera-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.3s ease;
+}
+
+.camera-grid-overlay.hidden {
+  opacity: 0;
+}
+
+.grid-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.grid-h1 { top: 33.333%; left: 0; right: 0; height: 1px; }
+.grid-h2 { top: 66.666%; left: 0; right: 0; height: 1px; }
+.grid-v1 { left: 33.333%; top: 0; bottom: 0; width: 1px; }
+.grid-v2 { left: 66.666%; top: 0; bottom: 0; width: 1px; }
+
+.grid-center-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+}
+
+.grid-center-cross::before, .grid-center-cross::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4);
+}
+.grid-center-cross::before { top: 9px; left: 0; width: 20px; height: 2px; }
+.grid-center-cross::after { left: 9px; top: 0; width: 2px; height: 20px; }
+
+/* Ghost Overlay del Planigramma */
+.ghost-overlay-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.ghost-image {
+  max-width: 90%;
+  max-height: 85%;
+  object-fit: contain;
+  opacity: 0.4;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.6));
+  transition: opacity 0.1s ease;
+}
+
+/* Top Bar Fotocamera */
+.camera-top-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 14px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  gap: 8px;
+}
+
+.cam-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+}
+
+.cam-target-info {
+  text-align: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.cam-target-pv {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: #CBD5E1;
+  text-transform: uppercase;
+  display: block;
+}
+
+.cam-target-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cam-quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cam-icon-btn {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cam-icon-btn:active {
+  transform: scale(0.92);
+}
+
+.cam-icon-btn.active-state {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* Slider Trasparenza Ghost */
+.ghost-slider-container {
+  position: relative;
+  z-index: 10;
+  align-self: center;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -6px;
+}
+
+.slider-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+.ghost-slider-container input[type="range"] {
+  width: 110px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.slider-val {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  width: 32px;
+}
+
+/* Suggerimento inquadratura */
+.framing-hint-pill {
+  position: relative;
+  z-index: 8;
+  align-self: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #F1F5F9;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 8px;
+}
+
+/* Bottom Bar Scatto */
+.camera-bottom-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 20px 24px 34px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+}
+
+.cam-bottom-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  min-width: 64px;
+}
+
+.btn-subtext {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: #CBD5E1;
+}
+
+.ref-thumb-mini {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 2px solid #FFFFFF;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.ref-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Shutter Button con Animazione Pulsante */
+.shutter-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shutter-button {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: transparent;
+  border: 4px solid #FFFFFF;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+.shutter-button:active {
+  transform: scale(0.92);
+}
+
+.shutter-inner-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF2A38 0%, #E30613 100%);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  transition: transform 0.15s ease;
+}
+
+.shutter-button:active .shutter-inner-ring {
+  transform: scale(0.88);
+}
+
+/* ==========================================================================
+   SCHERMATA REVISIONE / POST-SCATTO
+   ========================================================================== */
+
+.review-viewport-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  background: #111317;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.review-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(24, 27, 32, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.review-title {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.review-action-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.review-action-btn.primary {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  box-shadow: 0 4px 12px var(--success-glow);
+}
+
+.review-image-canvas-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.review-comparison-container {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.review-preview-img {
+  max-width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.review-ghost-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  border-radius: var(--radius-md);
+  transition: opacity 0.15s ease;
+}
+
+.review-slider-bar {
+  background: rgba(24, 27, 32, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.slider-text-label {
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: #E2E8F0;
+}
+
+.review-slider-bar input[type="range"] {
+  flex: 1;
+  max-width: 180px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.review-toolbox {
+  background: rgba(24, 27, 32, 0.95);
+  backdrop-filter: blur(12px);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tool-btn {
+  background: none;
+  border: none;
+  color: #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.tool-btn:hover, .tool-btn.active {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.review-notes-box {
+  background: #181B20;
+  padding: 10px 20px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.notes-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: #252A33;
+  border: 1px solid #3B4252;
+  border-radius: var(--radius-md);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.notes-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Spinner caricamento */
+.uploading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 19, 23, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.uploading-card {
+  text-align: center;
+  background: #1E222A;
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  max-width: 320px;
+}
+
+.spinner-karma {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(227, 6, 19, 0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.uploading-card h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.uploading-card p {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+}
