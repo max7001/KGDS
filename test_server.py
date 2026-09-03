@@ -58,8 +58,8 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
 
-        # Se richiesta proxy verso il backend Karma (/api/wcam/...)
-        if path.startswith('/api/wcam'):
+        # Se richiesta proxy verso il backend Karma (/api/wcam/... o /api/karma-search)
+        if path.startswith('/api/wcam') or path.startswith('/api/karma-search'):
             return self.proxy_to_karma(parsed, 'GET')
 
         # Se root, servi index.html
@@ -73,7 +73,7 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
 
-        if path.startswith('/api/wcam'):
+        if path.startswith('/api/wcam') or path.startswith('/api/karma-search'):
             return self.proxy_to_karma(parsed, 'POST')
 
         return super().do_POST()
@@ -91,14 +91,18 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(content)
 
     def proxy_to_karma(self, parsed, method):
-        # Rimuovi prefisso /api/wcam
-        subpath = parsed.path[len('/api/wcam'):]
-        if subpath.startswith('/'):
-            subpath = subpath[1:]
-
-        remote_url = f"{REMOTE_WCAM_BASE}/{subpath}"
-        if parsed.query:
-            remote_url += f"?{parsed.query}"
+        if parsed.path.startswith('/api/karma-search'):
+            remote_url = "https://www.karmaitaliana.it/it/search.html"
+            if parsed.query:
+                remote_url += f"?{parsed.query}"
+        else:
+            # Rimuovi prefisso /api/wcam
+            subpath = parsed.path[len('/api/wcam'):]
+            if subpath.startswith('/'):
+                subpath = subpath[1:]
+            remote_url = f"{REMOTE_WCAM_BASE}/{subpath}"
+            if parsed.query:
+                remote_url += f"?{parsed.query}"
 
         # Leggi body per POST
         body = None

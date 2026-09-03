@@ -4,6 +4,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/karma-search",
+      "destination": "https://www.karmaitaliana.it/it/search.html"
+    },
+    {
       "source": "/api/wcam/:path*",
       "destination": "https://www.karmaitaliana.it/wcam/:path*"
     }

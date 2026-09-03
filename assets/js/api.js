@@ -80,9 +80,20 @@ const KarmaAPI = (function() {
       const name = titleEl ? titleEl.textContent.trim() : 'Catena';
 
       const descEl = a.querySelector('p');
-      let lastVisit = '';
+      let lastVisitDate = '';
+      let lastVisitShop = '';
       if (descEl) {
-        lastVisit = descEl.textContent.replace('Ultimo PV visitato:', '').trim().replace(/\s+/g, ' ');
+        const bEl = descEl.querySelector('b');
+        if (bEl && bEl.textContent.trim()) {
+          lastVisitDate = bEl.textContent.trim();
+        }
+        // Estrai il nome del punto vendita (es. Mantova, Riccione, Udine)
+        const fullText = descEl.textContent.replace('Ultimo PV visitato:', '').trim();
+        if (lastVisitDate) {
+          lastVisitShop = fullText.replace(lastVisitDate, '').trim();
+        } else {
+          lastVisitShop = fullText;
+        }
       }
 
       const badgeEl = a.querySelector('.badge');
@@ -92,13 +103,53 @@ const KarmaAPI = (function() {
         groups.push({
           id: groupId,
           name: name,
-          lastVisit: lastVisit,
+          lastVisitDate: lastVisitDate,
+          lastVisitShop: lastVisitShop,
           shopsCount: badgeText
         });
       }
     });
 
     return { authenticated: true, groups };
+  }
+
+  // Cache immagini prodotti
+  const productImageCache = {};
+
+  // Recupero fotografia prodotto da www.karmaitaliana.it
+  async function getProductImage(productCode) {
+    const code = (productCode || '').trim();
+    if (!code) return null;
+    if (productImageCache[code]) return productImageCache[code];
+
+    try {
+      const formData = new URLSearchParams();
+      formData.append('keyword', code);
+
+      const response = await fetch('/api/karma-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+      });
+
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      const imgs = doc.querySelectorAll('img');
+      for (const img of imgs) {
+        const src = img.getAttribute('src') || '';
+        if (src.includes('catalogmedia/images/medium/') || src.includes('catalogmedia/images/large/') || src.includes('catalogmedia/images/product/')) {
+          productImageCache[code] = src;
+          return src;
+        }
+      }
+    } catch (e) {
+      console.warn("Impossibile recuperare foto prodotto per", code, e);
+    }
+    return null;
   }
 
   // 3. GET SHOPS (Punti Vendita per Catena)
@@ -311,6 +362,7 @@ const KarmaAPI = (function() {
     getShops,
     getExhibitors,
     getStock,
+    getProductImage,
     uploadPhoto,
     logout
   };

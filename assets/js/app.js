@@ -3,6 +3,8 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
+const APP_VERSION = 'v2.1';
+
 const AppRouter = (function() {
   let state = {
     currentView: 'Login',
@@ -32,6 +34,11 @@ const AppRouter = (function() {
   const userName = document.getElementById('userNameLabel');
 
   function init() {
+    // Mostra versione corrente dell'applicazione
+    document.querySelectorAll('.app-version-val').forEach(el => {
+      el.textContent = APP_VERSION;
+    });
+
     // Verifica se c'è un utente ricordato per comodità dell'agente
     const savedUser = localStorage.getItem('karma_remembered_username');
     if (savedUser) {
@@ -184,8 +191,9 @@ const AppRouter = (function() {
       card.innerHTML = `
         <div class="card-content-main">
           <h2 class="card-item-title">${escapeHtml(g.name)}</h2>
-          <div class="card-item-meta">
-            ${g.lastVisit ? `<span class="meta-pill">Ultima visita: <b>${escapeHtml(g.lastVisit)}</b></span>` : ''}
+          <div class="meta-lines-box">
+            ${g.lastVisitDate ? `<div class="meta-line-date">Ultimo PV visitato: <b>${escapeHtml(g.lastVisitDate)}</b></div>` : ''}
+            ${g.lastVisitShop ? `<div class="meta-line-shop">${escapeHtml(g.lastVisitShop)}</div>` : ''}
           </div>
         </div>
         <div class="card-actions-group">
@@ -207,7 +215,7 @@ const AppRouter = (function() {
     navigateTo('Shops');
   }
 
-  // 3. GESTIONE PUNTI VENDITA (SHOPS)
+  // 3. GESTIONE PUNTI VENDITA (SHOPS COMPATTI SU 2 RIGHE + 2 TASTI AFFIANCATI)
   async function loadShops(groupId) {
     const loading = document.getElementById('shopsLoading');
     const list = document.getElementById('shopsList');
@@ -244,31 +252,36 @@ const AppRouter = (function() {
 
     state.filteredShops.forEach(s => {
       const card = document.createElement('div');
-      card.className = 'interactive-card';
+      card.className = 'compact-shop-card';
 
       card.innerHTML = `
-        <div class="card-content-main" onclick="AppRouter.selectShop('${s.id}', '${escapeHtml(s.name)}')">
-          <h2 class="card-item-title">${escapeHtml(s.name)}</h2>
-          <div class="card-item-meta">
-            ${s.lastVisit ? `<span class="meta-pill">Ultima visita: <b>${escapeHtml(s.lastVisit)}</b></span>` : ''}
-            ${s.averageDays ? `<span class="meta-pill">Media: <b>${escapeHtml(s.averageDays)}</b></span>` : ''}
-          </div>
+        <!-- Riga 1: Nome negozio -->
+        <div class="shop-title-row">
+          <span class="shop-name-bold">${escapeHtml(s.name)}</span>
         </div>
-        <div class="card-actions-group">
-          ${s.hasStock ? `
-            <button type="button" class="btn-card-action" title="Visualizza giacenze" onclick="event.stopPropagation(); AppRouter.openStockFor('${s.groupId}', '${s.id}', '${escapeHtml(s.name)}')">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-              </svg>
-              Giacenze
-            </button>
-          ` : ''}
-          <button type="button" class="btn-card-action primary-action" onclick="AppRouter.selectShop('${s.id}', '${escapeHtml(s.name)}')">
-            Espositori
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="9 18 15 12 9 6"></polyline>
+
+        <!-- Riga 2: Data ultima visita e media giorni -->
+        <div class="shop-meta-row">
+          <span class="shop-meta-item">Ultima visita: <strong>${escapeHtml(s.lastVisit || '--')}</strong></span>
+          ${s.averageDays ? `<span class="shop-meta-item">&bull; Media: <strong>${escapeHtml(s.averageDays)}</strong></span>` : ''}
+        </div>
+
+        <!-- Sotto riga 2: Tasti affiancati Giacenze ed Esposizioni -->
+        <div class="shop-buttons-row">
+          <button type="button" class="btn-shop-stock" onclick="event.stopPropagation(); AppRouter.openStockFor('${s.groupId}', '${s.id}', '${escapeHtml(s.name)}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
             </svg>
+            Giacenze
+          </button>
+          <button type="button" class="btn-shop-exhibitors" onclick="AppRouter.selectShop('${s.id}', '${escapeHtml(s.name)}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Esposizioni
           </button>
         </div>
       `;
@@ -311,7 +324,7 @@ const AppRouter = (function() {
     navigateTo('Exhibitors');
   }
 
-  // 4. GESTIONE ESPOSITORI
+  // 4. GESTIONE ESPOSITORI (COMPATTO SENZA SIMBOLO TONDO GRANDE)
   async function loadExhibitors(groupId, shopId) {
     const loading = document.getElementById('exhibitorsLoading');
     const list = document.getElementById('exhibitorsList');
@@ -368,43 +381,30 @@ const AppRouter = (function() {
     state.exhibitors.forEach(e => {
       const isDone = (e.status === 'done');
       const card = document.createElement('article');
-      card.className = `espositore-row-card ${isDone ? 'card-done' : ''}`;
+      card.className = `compact-espositore-card ${isDone ? 'card-done' : ''}`;
 
       card.innerHTML = `
-        <div class="status-indicator-col">
-          <div class="status-icon-bubble ${isDone ? 'bubble-done' : 'bubble-pending'}">
-            ${isDone ? `
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            ` : `
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-            `}
+        <div class="compact-espositore-main">
+          <div class="compact-espositore-header">
+            <span class="compact-espositore-title">${escapeHtml(e.title)}</span>
+            <span class="badge-status-pill ${isDone ? 'done' : 'pending'}">
+              ${isDone ? '✓ Foto OK' : '⚠ Da Fotografare'}
+            </span>
           </div>
-        </div>
 
-        <div class="espositore-body-col">
-          <h2 class="espositore-title">${escapeHtml(e.title)}</h2>
-          <div class="espositore-guide-btns">
+          <div class="compact-guides-row">
             ${e.expImg ? `
               <button type="button" class="btn-mini-guide" onclick="AppRouter.openGuide('Esposizione: ${escapeHtml(e.title)}', '${e.expImg}')">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                  <line x1="4" y1="22" x2="4" y2="15"></line>
                 </svg>
                 Esposizione
               </button>
             ` : ''}
             ${e.planImg ? `
               <button type="button" class="btn-mini-guide" onclick="AppRouter.openGuide('Planigramma: ${escapeHtml(e.title)}', '${e.planImg}')">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="3" y1="9" x2="21" y2="9"></line>
-                  <line x1="9" y1="21" x2="9" y2="9"></line>
                 </svg>
                 Planigramma
               </button>
@@ -412,22 +412,14 @@ const AppRouter = (function() {
           </div>
         </div>
 
-        <div class="espositore-action-col">
+        <div class="compact-espositore-action">
           ${isDone ? `
-            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
-              <span class="badge-completed-chip">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                Foto OK
-              </span>
-              <button type="button" style="background:none;border:none;color:#64748B;font-size:0.75rem;cursor:pointer;text-decoration:underline;" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(e.title)}', '${e.planImg}', '${e.expImg}')">
-                Rifai scatto
-              </button>
-            </div>
+            <button type="button" class="btn-card-action" style="padding: 6px 10px; font-size: 0.775rem;" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(e.title)}', '${e.planImg}', '${e.expImg}')">
+              Rifai scatto
+            </button>
           ` : `
-            <button type="button" class="btn-take-photo" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(e.title)}', '${e.planImg}', '${e.expImg}')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button type="button" class="btn-take-photo" style="padding: 8px 14px; font-size: 0.825rem;" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(e.title)}', '${e.planImg}', '${e.expImg}')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                 <circle cx="12" cy="13" r="4"></circle>
               </svg>
@@ -458,7 +450,7 @@ const AppRouter = (function() {
     }
   }
 
-  // 5. MODALI GUIDA & GIACENZE
+  // 5. MODALI: GUIDA, GIACENZE E FOTO PRODOTTO
   function openGuide(title, imgUrl) {
     document.getElementById('modalGuideTitle').textContent = title;
     document.getElementById('modalGuideImgTag').src = imgUrl;
@@ -494,15 +486,23 @@ const AppRouter = (function() {
     tbody.innerHTML = '';
 
     if (items.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="3" class="text-center" style="padding:20px;color:#94A3B8;">Nessun articolo in giacenza per questo punto vendita.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="2" class="text-center" style="padding:20px;color:#94A3B8;">Nessun articolo in giacenza per questo punto vendita.</td></tr>';
       return;
     }
 
     items.forEach(it => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><strong>${escapeHtml(it.code)}</strong></td>
-        <td>${escapeHtml(it.barcode)}</td>
+        <td>
+          <button type="button" class="btn-product-code-link" onclick="AppRouter.openProductPhoto('${escapeHtml(it.code)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <strong>${escapeHtml(it.code)}</strong>
+          </button>
+        </td>
         <td class="text-center"><span class="badge-pill-dark">${escapeHtml(it.qty)}</span></td>
       `;
       tbody.appendChild(tr);
@@ -514,13 +514,88 @@ const AppRouter = (function() {
     if (!q) {
       renderStockTable(state.stockItems);
     } else {
-      const filtered = state.stockItems.filter(it => it.code.toLowerCase().includes(q) || it.barcode.toLowerCase().includes(q));
+      const filtered = state.stockItems.filter(it => it.code.toLowerCase().includes(q));
       renderStockTable(filtered);
     }
   }
 
   function closeStock() {
     document.getElementById('modalStockView').style.display = 'none';
+  }
+
+  // Visualizzazione Foto Prodotto da karmaitaliana.it
+  async function openProductPhoto(code) {
+    document.getElementById('modalProductPhotoTitle').textContent = 'Articolo: ' + code;
+    document.getElementById('modalProductPhotoView').style.display = 'flex';
+
+    const loading = document.getElementById('productPhotoLoading');
+    const container = document.getElementById('productPhotoContainer');
+    const notFound = document.getElementById('productPhotoNotFound');
+    const imgTag = document.getElementById('modalProductImgTag');
+
+    loading.style.display = 'block';
+    container.style.display = 'none';
+    notFound.style.display = 'none';
+
+    try {
+      const imgUrl = await KarmaAPI.getProductImage(code);
+      loading.style.display = 'none';
+
+      if (imgUrl) {
+        imgTag.src = imgUrl;
+        container.style.display = 'flex';
+      } else {
+        notFound.style.display = 'block';
+      }
+    } catch (e) {
+      loading.style.display = 'none';
+      notFound.style.display = 'block';
+    }
+  }
+
+  function closeProductPhoto() {
+    document.getElementById('modalProductPhotoView').style.display = 'none';
+  }
+
+  // 6. ISTRUZIONI E STATISTICHE GENERALI
+  function openInstructions() {
+    document.getElementById('modalInstructionsView').style.display = 'flex';
+  }
+
+  function closeInstructions() {
+    document.getElementById('modalInstructionsView').style.display = 'none';
+  }
+
+  function openStats() {
+    document.getElementById('modalStatsView').style.display = 'flex';
+    document.getElementById('statsKpiGroups').textContent = state.groups.length;
+
+    let totalShops = 0;
+    state.groups.forEach(g => {
+      const match = (g.shopsCount || '').match(/(\d+)/);
+      if (match) totalShops += parseInt(match[1], 10);
+    });
+    document.getElementById('statsKpiShops').textContent = totalShops;
+
+    const tbody = document.getElementById('statsTableBody');
+    tbody.innerHTML = '';
+
+    state.groups.forEach(g => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${escapeHtml(g.name)}</strong></td>
+        <td class="text-center"><span class="badge-pill-dark">${escapeHtml(g.shopsCount || '0 PV')}</span></td>
+        <td>
+          ${escapeHtml(g.lastVisitDate || '--')}
+          ${g.lastVisitShop ? `<br><small style="color:var(--primary); font-weight:700;">${escapeHtml(g.lastVisitShop)}</small>` : ''}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function closeStats() {
+    document.getElementById('modalStatsView').style.display = 'none';
   }
 
   // NAVIGAZIONE INDIETRO
@@ -564,6 +639,12 @@ const AppRouter = (function() {
     openStockFor,
     filterStockTable,
     closeStock,
+    openProductPhoto,
+    closeProductPhoto,
+    openInstructions,
+    closeInstructions,
+    openStats,
+    closeStats,
     handleNavBack,
     handleLogout
   };
@@ -592,6 +673,11 @@ function closeStockModal() { AppRouter.closeStock(); }
 function filterStockTable() { AppRouter.filterStockTable(); }
 function openGuideModal(t, img) { AppRouter.openGuide(t, img); }
 function closeGuideModal() { AppRouter.closeGuide(); }
+function openInstructionsModal() { AppRouter.openInstructions(); }
+function closeInstructionsModal() { AppRouter.closeInstructions(); }
+function openStatsModal() { AppRouter.openStats(); }
+function closeStatsModal() { AppRouter.closeStats(); }
+function closeProductPhotoModal() { AppRouter.closeProductPhoto(); }
 
 window.addEventListener('DOMContentLoaded', () => {
   AppRouter.init();

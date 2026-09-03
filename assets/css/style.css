@@ -991,3 +991,399 @@ body {
     justify-content: center;
   }
 }
+
+/* ==========================================================================
+   AGGIORNAMENTI V2.1: SIMBOLI "i" E STATISTICHE, VISTE COMPATTE E FOTO
+   ========================================================================== */
+
+/* Header Card con Simboli "i" e Statistiche */
+.header-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.header-action-symbols {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-action-symbol {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--card-border);
+  background: #F8FAFC;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-action-symbol:hover {
+  background: #181B20;
+  color: #FFFFFF;
+  border-color: #181B20;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-action-symbol.info-symbol {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* Catene: Nome punto vendita su riga successiva */
+.meta-lines-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.meta-line-date {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.meta-line-shop {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* PUNTI VENDITA COMPATTI: 2 RIGHE + 2 TASTI AFFIANCATI */
+.compact-shops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compact-shop-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  border: 1.5px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.compact-shop-card:hover {
+  border-color: #CBD5E1;
+  box-shadow: var(--shadow-md);
+}
+
+/* Riga 1: Nome Negozio */
+.shop-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shop-name-bold {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Riga 2: Data ultima visita e Media giorni */
+.shop-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+}
+
+.shop-meta-item strong {
+  color: var(--text-main);
+}
+
+/* Sotto la riga 2: Tasti affiancati Giacenze ed Esposizioni */
+.shop-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #F1F5F9;
+}
+
+.btn-shop-stock, .btn-shop-exhibitors {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn-shop-stock {
+  background: #F8FAFC;
+  border: 1.5px solid var(--card-border);
+  color: var(--text-main);
+}
+
+.btn-shop-stock:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.btn-shop-exhibitors {
+  background: linear-gradient(135deg, #FF2A38 0%, #E30613 100%);
+  border: none;
+  color: #FFFFFF;
+  box-shadow: 0 3px 10px var(--primary-glow);
+}
+
+.btn-shop-exhibitors:hover {
+  transform: translateY(-1px);
+}
+
+/* ESPOSITORI COMPATTI (SENZA CERCHIO GRANDE) */
+.compact-espositori-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compact-espositore-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  border: 1.5px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: var(--transition);
+}
+
+.compact-espositore-card.card-done {
+  background: #F0FDF4;
+  border-color: #86EFAC;
+}
+
+.compact-espositore-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-espositore-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.compact-espositore-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.badge-status-pill {
+  font-size: 0.725rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.badge-status-pill.done {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.badge-status-pill.pending {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.compact-guides-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* LINK CODICE PRODOTTO E FOTO POPUP */
+.btn-product-code-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: #2563EB;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-product-code-link:hover {
+  color: var(--primary);
+}
+
+.alert-photo-not-found {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-muted);
+}
+
+.alert-photo-not-found p {
+  margin-top: 10px;
+  font-size: 0.875rem;
+}
+
+/* MODAL ISTRUZIONI & STATISTICHE */
+.instruction-header-symbol {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2563EB;
+  color: #FFFFFF;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.instructions-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #F8FAFC;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+}
+
+.instruction-num-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #181B20;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.instruction-text-block h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 3px;
+}
+
+.instruction-text-block p {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.stats-header-symbol {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #10B981;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-kpi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  background: #F8FAFC;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+  text-align: center;
+}
+
+.kpi-num {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+
+.kpi-title {
+  font-size: 0.775rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.4px;
+  margin-top: 4px;
+  display: block;
+}
+
+.stats-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+/* FOOTER VERSIONE */
+.app-version-footer {
+  text-align: center;
+  padding: 24px 16px 12px;
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.version-tag {
+  background: #E2E8F0;
+  color: #475569;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  font-weight: 800;
+}
+
