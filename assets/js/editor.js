@@ -158,8 +158,8 @@ const EditorController = (function() {
       spinnerOverlay.style.display = 'none';
 
       closeStudio();
-      // Ricarica la vista degli espositori aggiornando lo stato in tempo reale
-      AppRouter.refreshExhibitors();
+      // Ritorna immediatamente alla schermata del negozio con l'espositore aggiornato
+      AppRouter.returnToShop(currentContext.exId);
     } catch (err) {
       console.error("Errore durante l'upload:", err);
       spinnerOverlay.style.display = 'none';

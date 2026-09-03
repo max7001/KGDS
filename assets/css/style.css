@@ -1472,3 +1472,154 @@ body {
   font-weight: 800;
 }
 
+/* ==========================================================================
+   CHECKLIST CONTROLLI E SALVATAGGIO VISITA (CARTELLINI E RIPARAZIONI)
+   ========================================================================== */
+
+.visit-verification-box {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  border-radius: var(--radius-md);
+  animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verification-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #15803D;
+  margin-bottom: 12px;
+}
+
+.verification-checkboxes-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .verification-checkboxes-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.verification-checkbox-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.verification-checkbox-card:hover {
+  border-color: #94A3B8;
+  background: #F8FAFC;
+}
+
+.verification-checkbox-card.checked {
+  background: #F0FDF4;
+  border-color: #16A34A;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+}
+
+.verification-checkbox-card input[type="checkbox"] {
+  display: none;
+}
+
+.custom-chk-box {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  border: 2px solid #94A3B8;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.verification-checkbox-card.checked .custom-chk-box {
+  background: #16A34A;
+  border-color: #16A34A;
+}
+
+.verification-checkbox-card.checked .custom-chk-box::after {
+  content: '';
+  width: 6px;
+  height: 11px;
+  border: solid #FFFFFF;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.chk-card-texts {
+  display: flex;
+  flex-direction: column;
+}
+
+.chk-main-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.chk-sub-title {
+  font-size: 0.725rem;
+  color: var(--text-secondary);
+}
+
+.save-visit-btn-row {
+  margin-top: 14px;
+  animation: fadeInDown 0.25s ease-out;
+}
+
+.btn-save-visit {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+  transition: var(--transition);
+}
+
+.btn-save-visit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45);
+}
+
+.btn-save-visit:active {
+  transform: translateY(0);
+}
+

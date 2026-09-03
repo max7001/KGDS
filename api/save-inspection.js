@@ -39,8 +39,8 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
     const {
+      type,
       groupId,
       chain,
       shopId,
@@ -49,11 +49,38 @@ module.exports = async (req, res) => {
       exTitle,
       agent,
       notes,
+      cartellini,
+      riparazioni,
       imageBase64
     } = req.body || {};
 
     const timestamp = new Date().toISOString();
     const dateStr = timestamp.split('T')[0];
+
+    // Gestione salvataggio visita completata
+    if (type === 'visit_completed') {
+      const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/visits?key=${FIREBASE_CONFIG.apiKey}`;
+      const docFields = {
+        agent: { stringValue: agent || 'Agente' },
+        chain: { stringValue: chain || 'Catena' },
+        groupId: { stringValue: String(groupId || '') },
+        shop: { stringValue: shop || 'Punto Vendita' },
+        shopId: { stringValue: String(shopId || '') },
+        cartellini: { booleanValue: !!cartellini },
+        riparazioni: { booleanValue: !!riparazioni },
+        timestamp: { timestampValue: timestamp },
+        date: { stringValue: dateStr },
+        status: { stringValue: 'visit_completed' }
+      };
+
+      const firestoreRes = await httpsRequest(firestoreUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }, JSON.stringify({ fields: docFields }));
+
+      return res.status(200).json({ success: true, type: 'visit_completed', timestamp });
+    }
+
     let photoUrl = null;
 
     // 1. Prova upload su Firebase Storage

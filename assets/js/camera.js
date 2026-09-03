@@ -62,6 +62,9 @@ const CameraController = (function() {
   function closeCamera() {
     stopStream();
     viewCamera.style.display = 'none';
+    if (typeof AppRouter !== 'undefined' && AppRouter.returnToShop) {
+      AppRouter.returnToShop();
+    }
   }
 
   async function initStream() {

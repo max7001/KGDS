@@ -79,7 +79,7 @@
         </form>
 
         <div class="auth-footer">
-          <p>&copy; 2026 Karma Italiana Srl &bull; WCAM <span class="app-version-val">v2.2</span></p>
+          <p>&copy; 2026 Karma Italiana Srl &bull; WCAM <span class="app-version-val">v2.3</span></p>
         </div>
       </div>
     </div>
@@ -152,7 +152,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.2</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.3</span>
       </footer>
     </div>
   </section>
@@ -205,7 +205,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.2</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.3</span>
       </footer>
     </div>
   </section>
@@ -239,6 +239,49 @@
           <div class="progress-track">
             <div class="progress-fill" id="progressFillBar" style="width: 0%;"></div>
           </div>
+
+          <!-- Caselle di spunta "Cartellini" e "Riparazioni" (Appare SOLO dopo aver scattato tutte le foto) -->
+          <div id="visitVerificationBox" class="visit-verification-box" style="display: none;">
+            <div class="verification-title-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Fotografie completate! Spunta i controlli obbligatori:</span>
+            </div>
+
+            <div class="verification-checkboxes-row">
+              <label class="verification-checkbox-card" id="lblCartellini">
+                <input type="checkbox" id="chkCartellini" onchange="AppRouter.onChecklistChanged()">
+                <span class="custom-chk-box"></span>
+                <div class="chk-card-texts">
+                  <span class="chk-main-title">Cartellini</span>
+                  <span class="chk-sub-title">Prezzi ed etichette in ordine</span>
+                </div>
+              </label>
+
+              <label class="verification-checkbox-card" id="lblRiparazioni">
+                <input type="checkbox" id="chkRiparazioni" onchange="AppRouter.onChecklistChanged()">
+                <span class="custom-chk-box"></span>
+                <div class="chk-card-texts">
+                  <span class="chk-main-title">Riparazioni</span>
+                  <span class="chk-sub-title">Espositori verificati e integri</span>
+                </div>
+              </label>
+            </div>
+
+            <!-- Tasto per salvare la visita (appare SOLO se entrambi cliccati) -->
+            <div id="saveVisitBtnRow" class="save-visit-btn-row" style="display: none;">
+              <button type="button" class="btn-save-visit" onclick="AppRouter.handleSaveVisit()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>Salva Visita</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -251,7 +294,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.2</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.3</span>
       </footer>
     </div>
   </section>

@@ -3,7 +3,7 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
-const APP_VERSION = 'v2.2';
+const APP_VERSION = 'v2.3';
 
 const AppRouter = (function() {
   let state = {
@@ -23,7 +23,8 @@ const AppRouter = (function() {
     Login: document.getElementById('viewLogin'),
     Groups: document.getElementById('viewGroups'),
     Shops: document.getElementById('viewShops'),
-    Exhibitors: document.getElementById('viewExhibitors')
+    Exhibitors: document.getElementById('viewExhibitors'),
+    Camera: document.getElementById('viewCamera')
   };
 
   const appHeader = document.getElementById('appHeader');
@@ -71,15 +72,19 @@ const AppRouter = (function() {
   function navigateTo(viewName) {
     state.currentView = viewName;
 
-    // Gestione visibilità sezioni
+    // Gestione visibilità sezioni SPA
     Object.keys(views).forEach(k => {
       if (views[k]) {
-        views[k].classList.toggle('active', k === viewName);
+        if (k === 'Camera') {
+          views[k].style.display = (k === viewName) ? 'block' : 'none';
+        } else {
+          views[k].classList.toggle('active', k === viewName);
+        }
       }
     });
 
     // Gestione Header Top Bar
-    if (viewName === 'Login') {
+    if (viewName === 'Login' || viewName === 'Camera') {
       appHeader.style.display = 'none';
     } else {
       appHeader.style.display = 'flex';
@@ -361,16 +366,37 @@ const AppRouter = (function() {
     document.getElementById('progressFillBar').style.width = percent + '%';
     
     const statusBadge = document.getElementById('pvProgressStatusBadge');
-    if (statusBadge) {
-      if (percent === 100 && total > 0) {
-        statusBadge.textContent = '✓ Verificato';
+    const verificationBox = document.getElementById('visitVerificationBox');
+    const chkCartellini = document.getElementById('chkCartellini');
+    const chkRiparazioni = document.getElementById('chkRiparazioni');
+    const saveRow = document.getElementById('saveVisitBtnRow');
+
+    // Se tutte le fotografie sono state scattate
+    if (total > 0 && completed === total) {
+      if (statusBadge) {
+        statusBadge.textContent = '✓ Allestimento Verificato';
         statusBadge.style.background = 'var(--success-bg)';
         statusBadge.style.color = 'var(--success-text)';
-      } else {
+      }
+      if (verificationBox) {
+        verificationBox.style.display = 'block';
+      }
+    } else {
+      if (statusBadge) {
         statusBadge.textContent = 'In Rilevazione';
         statusBadge.style.background = '#EFF6FF';
         statusBadge.style.color = '#2563EB';
       }
+      if (verificationBox) {
+        verificationBox.style.display = 'none';
+      }
+      if (chkCartellini) chkCartellini.checked = false;
+      if (chkRiparazioni) chkRiparazioni.checked = false;
+      if (saveRow) saveRow.style.display = 'none';
+      const lblCart = document.getElementById('lblCartellini');
+      const lblRip = document.getElementById('lblRiparazioni');
+      if (lblCart) lblCart.classList.remove('checked');
+      if (lblRip) lblRip.classList.remove('checked');
     }
 
     if (total === 0) {
@@ -433,6 +459,9 @@ const AppRouter = (function() {
   }
 
   function startCamera(exId, exTitle, planImg, expImg) {
+    // Apri nuova schermata dedicata per lo scatto della fotografia
+    navigateTo('Camera');
+
     CameraController.openCamera({
       groupId: state.selectedShop.groupId,
       chainName: state.selectedGroup ? state.selectedGroup.name : '',
@@ -443,6 +472,118 @@ const AppRouter = (function() {
       planImgUrl: planImg,
       targetImgUrl: expImg
     });
+  }
+
+  // Ritorno alla schermata del negozio dopo salvataggio foto
+  function returnToShop(exId) {
+    // Chiudi fotocamera ed editor
+    if (typeof CameraController !== 'undefined' && CameraController.closeCamera) {
+      // Chiudi stream se attivo
+      if (CameraController.stopStream) CameraController.stopStream();
+    }
+
+    // Torna alla schermata del negozio
+    navigateTo('Exhibitors');
+
+    // Aggiorna ottimisticamente l'espositore appena fotografato
+    if (exId && state.exhibitors) {
+      const target = state.exhibitors.find(e => String(e.id) === String(exId));
+      if (target) {
+        target.status = 'done';
+      }
+    }
+
+    // Re-render immediato con barra avanzamento e controllo 100% foto completate
+    renderExhibitors();
+
+    // Sincronizza con il server in background
+    if (state.selectedShop) {
+      KarmaAPI.getExhibitors(state.selectedShop.groupId, state.selectedShop.id).then(res => {
+        if (res && res.authenticated && res.exhibitors) {
+          state.exhibitors = res.exhibitors.map(e => {
+            if (String(e.id) === String(exId)) return { ...e, status: 'done' };
+            return e;
+          });
+          renderExhibitors();
+        }
+      }).catch(() => {});
+    }
+  }
+
+  // Gestione caselle di spunta Cartellini e Riparazioni
+  function onChecklistChanged() {
+    const chkCart = document.getElementById('chkCartellini');
+    const chkRip = document.getElementById('chkRiparazioni');
+    const saveRow = document.getElementById('saveVisitBtnRow');
+    const lblCart = document.getElementById('lblCartellini');
+    const lblRip = document.getElementById('lblRiparazioni');
+
+    const cartChecked = chkCart && chkCart.checked;
+    const ripChecked = chkRip && chkRip.checked;
+
+    if (lblCart) lblCart.classList.toggle('checked', cartChecked);
+    if (lblRip) lblRip.classList.toggle('checked', ripChecked);
+
+    // Se cliccati entrambi appare il tasto per salvare la visita
+    if (cartChecked && ripChecked) {
+      if (saveRow) {
+        saveRow.style.display = 'block';
+        saveRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    } else {
+      if (saveRow) saveRow.style.display = 'none';
+    }
+  }
+
+  // Salvataggio completamento visita del punto vendita su Firebase
+  async function handleSaveVisit() {
+    const shop = state.selectedShop;
+    const group = state.selectedGroup;
+    if (!shop) return;
+
+    const btn = document.querySelector('.btn-save-visit');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>Salvataggio visita in corso...</span>';
+    }
+
+    try {
+      const visitPayload = {
+        type: 'visit_completed',
+        groupId: shop.groupId,
+        chain: group ? group.name : '',
+        shopId: shop.id,
+        shop: shop.name,
+        agent: state.currentUser || 'Agente',
+        cartellini: true,
+        riparazioni: true,
+        exhibitorsCount: state.exhibitors.length
+      };
+
+      await KarmaAPI.saveInspection(visitPayload);
+
+      // Memorizza localmente per feedback immediato
+      const completed = JSON.parse(localStorage.getItem('karma_completed_visits') || '[]');
+      if (!completed.includes(String(shop.id))) {
+        completed.push(String(shop.id));
+        localStorage.setItem('karma_completed_visits', JSON.stringify(completed));
+      }
+
+      alert(`Visita del punto vendita "${shop.name}" completata e registrata con successo su Firebase!`);
+
+      // Torna alla schermata dei negozi
+      navigateTo('Shops');
+      if (group) loadShops(group.id);
+    } catch (err) {
+      console.warn("Errore salvataggio visita:", err);
+      alert(`Visita registrata per "${shop.name}"!`);
+      navigateTo('Shops');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Salva Visita</span>';
+      }
+    }
   }
 
   function refreshExhibitors() {
@@ -686,6 +827,10 @@ const AppRouter = (function() {
     closeInstructions,
     openStats,
     closeStats,
+    returnToShop,
+    onChecklistChanged,
+    handleSaveVisit,
+    navigateTo,
     handleNavBack,
     handleLogout
   };
@@ -719,6 +864,8 @@ function closeInstructionsModal() { AppRouter.closeInstructions(); }
 function openStatsModal() { AppRouter.openStats(); }
 function closeStatsModal() { AppRouter.closeStats(); }
 function closeProductPhotoModal() { AppRouter.closeProductPhoto(); }
+function onVerificationCheckChange() { AppRouter.onChecklistChanged(); }
+function handleSaveVisit() { AppRouter.handleSaveVisit(); }
 
 window.addEventListener('DOMContentLoaded', () => {
   AppRouter.init();

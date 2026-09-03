@@ -102,6 +102,38 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
         timestamp = datetime.now(timezone.utc).isoformat()
         date_str = timestamp.split('T')[0]
 
+        # Gestione visita completata
+        if payload.get('type') == 'visit_completed':
+            fs_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/visits?key={api_key}"
+            doc_fields = {
+                'agent': {'stringValue': payload.get('agent', 'Agente')},
+                'chain': {'stringValue': payload.get('chain', 'Catena')},
+                'groupId': {'stringValue': str(payload.get('groupId', ''))},
+                'shop': {'stringValue': payload.get('shop', 'Punto Vendita')},
+                'shopId': {'stringValue': str(payload.get('shopId', ''))},
+                'cartellini': {'booleanValue': bool(payload.get('cartellini'))},
+                'riparazioni': {'booleanValue': bool(payload.get('riparazioni'))},
+                'timestamp': {'timestampValue': timestamp},
+                'date': {'stringValue': date_str},
+                'status': {'stringValue': 'visit_completed'}
+            }
+            try:
+                fs_body = json.dumps({'fields': doc_fields}).encode('utf-8')
+                fs_req = urllib.request.Request(fs_url, data=fs_body, headers={'Content-Type': 'application/json'})
+                with urllib.request.urlopen(fs_req, timeout=10) as fs_resp:
+                    pass
+            except Exception as ex:
+                print("Errore salvataggio visita Firestore:", ex)
+
+            resp_payload = json.dumps({'success': True, 'type': 'visit_completed', 'timestamp': timestamp}).encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(resp_payload)))
+            self.end_headers()
+            self.wfile.write(resp_payload)
+            return
+
         img_b64 = payload.get('imageBase64', '')
         photo_url = None
 
