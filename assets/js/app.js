@@ -3,7 +3,7 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
-const APP_VERSION = 'v2.4';
+const APP_VERSION = 'v2.5';
 
 const AppRouter = (function() {
   let state = {
@@ -352,6 +352,22 @@ const AppRouter = (function() {
     }
   }
 
+  function cleanCategoryTitle(title) {
+    if (!title) return 'Espositore';
+    title = title.trim();
+    const words = title.split(/\s+/);
+    const len = words.length;
+    if (len >= 2 && len % 2 === 0) {
+      const half = len / 2;
+      const firstHalf = words.slice(0, half).join(' ');
+      const secondHalf = words.slice(half).join(' ');
+      if (firstHalf.toLowerCase() === secondHalf.toLowerCase()) {
+        return firstHalf;
+      }
+    }
+    return title;
+  }
+
   function renderExhibitors() {
     const list = document.getElementById('exhibitorsList');
     list.innerHTML = '';
@@ -407,19 +423,18 @@ const AppRouter = (function() {
       const isDone = (e.status === 'done');
       const card = document.createElement('article');
       card.className = `compact-espositore-card ${isDone ? 'card-done' : ''}`;
+      const displayTitle = cleanCategoryTitle(e.title);
 
       card.innerHTML = `
         <div class="compact-espositore-main">
           <div class="compact-espositore-header">
-            <span class="compact-espositore-title">${escapeHtml(e.title)}</span>
-            <span class="badge-status-pill ${isDone ? 'done' : 'pending'}">
-              ${isDone ? '✓ Foto OK' : '⚠ Da Fotografare'}
-            </span>
+            <span class="compact-espositore-title">${escapeHtml(displayTitle)}</span>
+            ${isDone ? '<span class="badge-status-pill done">✓ Foto OK</span>' : ''}
           </div>
 
           <div class="compact-guides-row">
             ${e.expImg ? `
-              <button type="button" class="btn-mini-guide" onclick="AppRouter.openGuide('Esposizione: ${escapeHtml(e.title)}', '${e.expImg}')">
+              <button type="button" class="btn-mini-guide" onclick="AppRouter.openGuide('Esposizione: ${escapeHtml(displayTitle)}', '${e.expImg}')">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
                 </svg>
@@ -427,7 +442,7 @@ const AppRouter = (function() {
               </button>
             ` : ''}
             ${e.planImg ? `
-              <button type="button" class="btn-mini-guide" onclick="AppRouter.openGuide('Planigramma: ${escapeHtml(e.title)}', '${e.planImg}')">
+              <button type="button" class="btn-mini-guide" onclick="AppRouter.openGuide('Planigramma: ${escapeHtml(displayTitle)}', '${e.planImg}')">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 </svg>
@@ -439,11 +454,11 @@ const AppRouter = (function() {
 
         <div class="compact-espositore-action">
           ${isDone ? `
-            <button type="button" class="btn-card-action" style="padding: 6px 10px; font-size: 0.775rem;" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(e.title)}', '${e.planImg}', '${e.expImg}')">
+            <button type="button" class="btn-card-action" style="padding: 6px 10px; font-size: 0.775rem;" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(displayTitle)}', '${e.planImg}', '${e.expImg}')">
               Rifai scatto
             </button>
           ` : `
-            <button type="button" class="btn-take-photo" style="padding: 8px 14px; font-size: 0.825rem;" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(e.title)}', '${e.planImg}', '${e.expImg}')">
+            <button type="button" class="btn-take-photo" style="padding: 8px 14px; font-size: 0.825rem;" onclick="AppRouter.startCamera('${e.id}', '${escapeHtml(displayTitle)}', '${e.planImg}', '${e.expImg}')">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                 <circle cx="12" cy="13" r="4"></circle>

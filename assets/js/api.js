@@ -293,9 +293,19 @@ const KarmaAPI = (function() {
       const isPending = th && th.innerHTML.includes('color: red');
       const isDone = !isPending;
 
-      // Titolo espositore
+      // Titolo espositore (elimina duplicazioni da <br>)
       const tdText = tr.querySelector('td:not(.align-middle)');
-      const title = tdText ? tdText.textContent.trim().replace(/\s+/g, ' ') : 'Espositore';
+      let title = 'Espositore';
+      if (tdText) {
+        const parts = tdText.innerHTML.split(/<br\s*\/?>/i)
+          .map(p => p.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim())
+          .filter(Boolean);
+        if (parts.length > 0) {
+          title = parts[0];
+        } else {
+          title = tdText.textContent.trim().replace(/\s+/g, ' ');
+        }
+      }
 
       // Link camera ed exid
       const camLink = tr.querySelector('a[href*="camera.php"]');
