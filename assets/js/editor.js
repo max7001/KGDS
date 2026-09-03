@@ -90,17 +90,21 @@ const EditorController = (function() {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = function() {
-        let width = img.width;
-        let height = img.height;
+        let srcX = 0, srcY = 0;
+        let srcW = img.width, srcH = img.height;
 
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
+        // Richiesta: La foto avrà formato verticale
+        if (srcW > srcH) {
+          srcW = Math.round(srcH * (3 / 4));
+          srcX = Math.round((img.width - srcW) / 2);
+        }
+
+        let width = srcW;
+        let height = srcH;
+
+        if (height > maxDimension) {
+          width = Math.round((width * maxDimension) / height);
+          height = maxDimension;
         }
 
         const canvas = document.createElement('canvas');
@@ -112,7 +116,7 @@ const EditorController = (function() {
           ctx.filter = 'contrast(1.15) brightness(1.08) saturate(1.1)';
         }
 
-        ctx.drawImage(img, 0, 0, width, height);
+        ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.src = dataUrl;

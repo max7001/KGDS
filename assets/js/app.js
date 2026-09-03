@@ -3,7 +3,7 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
-const APP_VERSION = 'v2.3';
+const APP_VERSION = 'v2.4';
 
 const AppRouter = (function() {
   let state = {
@@ -157,15 +157,13 @@ const AppRouter = (function() {
 
   // 2. GESTIONE CATENE
   async function loadGroups() {
-    const loading = document.getElementById('groupsLoading');
     const list = document.getElementById('groupsList');
-
-    loading.style.display = 'block';
-    list.innerHTML = '';
+    if (state.groups.length === 0 && list) {
+      list.innerHTML = '<div class="loading-box"><div class="spinner-karma"></div><p>Caricamento catene dal database...</p></div>';
+    }
 
     try {
       const res = await KarmaAPI.getGroups();
-      loading.style.display = 'none';
 
       if (!res.authenticated) {
         navigateTo('Login');
@@ -175,12 +173,13 @@ const AppRouter = (function() {
       state.groups = res.groups;
       renderGroups();
     } catch (e) {
-      loading.innerHTML = '<p class="text-danger">Errore di caricamento delle catene dal server.</p>';
+      if (list) list.innerHTML = '<p class="text-danger" style="padding:20px;text-align:center;">Errore di caricamento delle catene dal server.</p>';
     }
   }
 
   function renderGroups() {
     const list = document.getElementById('groupsList');
+    if (!list) return;
     list.innerHTML = '';
 
     if (state.groups.length === 0) {
@@ -312,7 +311,7 @@ const AppRouter = (function() {
     if (criteria === 'name') {
       state.filteredShops.sort((a, b) => a.name.localeCompare(b.name));
     } else if (criteria === 'date') {
-      state.filteredShops.sort((a, b) => (b.lastVisit || '').localeCompare(a.lastVisit || ''));
+      state.filteredShops.sort((a, b) => (b.lastVisitRaw || b.lastVisit || '').localeCompare(a.lastVisitRaw || a.lastVisit || ''));
     }
     renderShops();
   }
@@ -635,16 +634,7 @@ const AppRouter = (function() {
     items.forEach(it => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>
-          <button type="button" class="btn-product-code-link" onclick="AppRouter.openProductPhoto('${escapeHtml(it.code)}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-            <strong>${escapeHtml(it.code)}</strong>
-          </button>
-        </td>
+        <td><strong style="font-size:0.95rem; color:var(--text-main);">${escapeHtml(it.code)}</strong></td>
         <td class="text-center"><span class="badge-pill-dark">${escapeHtml(it.qty)}</span></td>
       `;
       tbody.appendChild(tr);

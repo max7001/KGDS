@@ -169,19 +169,31 @@ const CameraController = (function() {
   function takeSnapshot() {
     if (navigator.vibrate) navigator.vibrate([40]);
 
-    let width = videoEl.videoWidth || 1280;
-    let height = videoEl.videoHeight || 720;
+    let videoW = videoEl.videoWidth || 1280;
+    let videoH = videoEl.videoHeight || 720;
 
-    canvasEl.width = width;
-    canvasEl.height = height;
+    // Richiesta: La foto avrà formato verticale (portrait)
+    let srcX = 0;
+    let srcY = 0;
+    let srcW = videoW;
+    let srcH = videoH;
+
+    // Se lo stream è orizzontale, ritaglia al centro in formato verticale 3:4
+    if (videoW > videoH) {
+      srcW = Math.round(videoH * (3 / 4));
+      srcX = Math.round((videoW - srcW) / 2);
+    }
+
+    canvasEl.width = srcW;
+    canvasEl.height = srcH;
     const ctx = canvasEl.getContext('2d');
 
     if (currentFacingMode === 'user') {
-      ctx.translate(width, 0);
+      ctx.translate(srcW, 0);
       ctx.scale(-1, 1);
     }
 
-    ctx.drawImage(videoEl, 0, 0, width, height);
+    ctx.drawImage(videoEl, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH);
     const dataUrl = canvasEl.toDataURL('image/jpeg', 0.92);
 
     closeCamera();
@@ -202,8 +214,31 @@ const CameraController = (function() {
 
     const reader = new FileReader();
     reader.onload = function(e) {
-      closeCamera();
-      EditorController.openStudio(e.target.result, currentContext);
+      const dataUrl = e.target.result;
+      const img = new Image();
+      img.onload = function() {
+        let srcW = img.width;
+        let srcH = img.height;
+        let srcX = 0;
+        let srcY = 0;
+
+        // Assicura formato verticale
+        if (srcW > srcH) {
+          srcW = Math.round(srcH * (3 / 4));
+          srcX = Math.round((img.width - srcW) / 2);
+        }
+
+        const cv = document.createElement('canvas');
+        cv.width = srcW;
+        cv.height = srcH;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, srcW, srcH);
+        const verticalDataUrl = cv.toDataURL('image/jpeg', 0.92);
+
+        closeCamera();
+        EditorController.openStudio(verticalDataUrl, currentContext);
+      };
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   }

@@ -8,6 +8,26 @@ const KarmaAPI = (function() {
   // Se siamo su Vercel o server locale con proxy, usiamo /api/wcam
   const API_BASE = '/api/wcam';
 
+  // Formatta date nel formato richiesto: GG Mese ANNO (es. 28 Maggio 2026)
+  function formatItalianDate(rawStr) {
+    if (!rawStr) return '';
+    const match = rawStr.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
+    if (!match) return rawStr.trim();
+
+    const day = parseInt(match[1], 10);
+    const monthNum = parseInt(match[2], 10);
+    let year = parseInt(match[3], 10);
+    if (year < 100) year += 2000;
+
+    const mesi = [
+      '', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+      'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+    ];
+
+    const meseNome = mesi[monthNum] || match[2];
+    return `${day} ${meseNome} ${year}`;
+  }
+
   // Helper per inviare richieste con credenziali/cookie inclusi
   async function request(endpoint, options = {}) {
     const url = `${API_BASE}/${endpoint.replace(/^\//, '')}`;
@@ -84,13 +104,15 @@ const KarmaAPI = (function() {
       let lastVisitShop = '';
       if (descEl) {
         const bEl = descEl.querySelector('b');
+        let rawDate = '';
         if (bEl && bEl.textContent.trim()) {
-          lastVisitDate = bEl.textContent.trim();
+          rawDate = bEl.textContent.trim();
+          lastVisitDate = formatItalianDate(rawDate);
         }
         // Estrai il nome del punto vendita (es. Mantova, Riccione, Udine)
         const fullText = descEl.textContent.replace('Ultimo PV visitato:', '').trim();
-        if (lastVisitDate) {
-          lastVisitShop = fullText.replace(lastVisitDate, '').trim();
+        if (rawDate) {
+          lastVisitShop = fullText.replace(rawDate, '').trim();
         } else {
           lastVisitShop = fullText;
         }
@@ -187,12 +209,21 @@ const KarmaAPI = (function() {
       const name = titleEl ? titleEl.textContent.trim() : 'Punto Vendita';
 
       // Data ultima visita
-      const duvEl = linkExhibitors.querySelector('.duv');
-      let lastVisitDate = '';
+      let lastVisitFormatted = '';
+      let lastVisitSortKey = '';
       const ps = linkExhibitors.querySelectorAll('p');
       ps.forEach(p => {
         if (p.textContent.includes('Ultima Visita:')) {
-          lastVisitDate = p.textContent.replace('Ultima Visita:', '').trim();
+          const cloneP = p.cloneNode(true);
+          cloneP.querySelectorAll('.duv, [hidden]').forEach(el => el.remove());
+          const cleanText = cloneP.textContent.replace(/Ultima Visita:/i, '').trim();
+          lastVisitFormatted = formatItalianDate(cleanText);
+          const match = cleanText.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
+          if (match) {
+            let y = parseInt(match[3], 10);
+            if (y < 100) y += 2000;
+            lastVisitSortKey = `${y}-${String(match[2]).padStart(2, '0')}-${String(match[1]).padStart(2, '0')}`;
+          }
         }
       });
 
@@ -214,7 +245,8 @@ const KarmaAPI = (function() {
           id: shopId,
           groupId: groupId,
           name: name,
-          lastVisit: lastVisitDate,
+          lastVisit: lastVisitFormatted,
+          lastVisitRaw: lastVisitSortKey,
           averageDays: averageDays,
           hasStock: hasStock
         });
@@ -401,6 +433,7 @@ const KarmaAPI = (function() {
     uploadPhoto,
     saveInspection,
     getFirebaseStats,
+    formatItalianDate,
     logout
   };
 })();

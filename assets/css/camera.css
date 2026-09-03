@@ -14,9 +14,15 @@
 }
 
 .camera-viewport-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -394,12 +400,15 @@
    ========================================================================== */
 
 .review-viewport-container {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 50;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 10001;
   background: #111317;
   display: flex;
   flex-direction: column;
