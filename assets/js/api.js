@@ -8,24 +8,38 @@ const KarmaAPI = (function() {
   // Se siamo su Vercel o server locale con proxy, usiamo /api/wcam
   const API_BASE = '/api/wcam';
 
-  // Formatta date nel formato richiesto: GG Mese ANNO (es. 28 Maggio 2026)
+  // Formatta date nel formato richiesto: GG Mese ANNO (es. 3 Settembre 2026 o 28 Maggio 2026)
   function formatItalianDate(rawStr) {
     if (!rawStr) return '';
-    const match = rawStr.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
-    if (!match) return rawStr.trim();
-
-    const day = parseInt(match[1], 10);
-    const monthNum = parseInt(match[2], 10);
-    let year = parseInt(match[3], 10);
-    if (year < 100) year += 2000;
+    rawStr = String(rawStr).split('T')[0].trim();
 
     const mesi = [
       '', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
       'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
     ];
 
-    const meseNome = mesi[monthNum] || match[2];
-    return `${day} ${meseNome} ${year}`;
+    // 1. Formato ISO: YYYY-MM-DD (es. 2026-09-03 da Firebase)
+    const matchIso = rawStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (matchIso) {
+      const year = parseInt(matchIso[1], 10);
+      const monthNum = parseInt(matchIso[2], 10);
+      const day = parseInt(matchIso[3], 10);
+      const meseNome = mesi[monthNum] || monthNum;
+      return `${day} ${meseNome} ${year}`;
+    }
+
+    // 2. Formato Europeo/Italiano: GG-MM-AA o GG-MM-AAAA (es. 28-05-26 da Karma)
+    const matchEu = rawStr.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
+    if (matchEu) {
+      const day = parseInt(matchEu[1], 10);
+      const monthNum = parseInt(matchEu[2], 10);
+      let year = parseInt(matchEu[3], 10);
+      if (year < 100) year += 2000;
+      const meseNome = mesi[monthNum] || monthNum;
+      return `${day} ${meseNome} ${year}`;
+    }
+
+    return rawStr;
   }
 
   // Helper per inviare richieste con credenziali/cookie inclusi

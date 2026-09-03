@@ -3,7 +3,7 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
-const APP_VERSION = 'v2.6';
+const APP_VERSION = 'v2.7';
 
 const AppRouter = (function() {
   let state = {
