@@ -3,7 +3,7 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
-const APP_VERSION = 'v2.5';
+const APP_VERSION = 'v2.6';
 
 const AppRouter = (function() {
   let state = {
@@ -170,10 +170,58 @@ const AppRouter = (function() {
         return;
       }
 
+      await syncGroupsWithFirebaseVisits(res.groups);
       state.groups = res.groups;
       renderGroups();
     } catch (e) {
       if (list) list.innerHTML = '<p class="text-danger" style="padding:20px;text-align:center;">Errore di caricamento delle catene dal server.</p>';
+    }
+  }
+
+  // Sincronizza le date e negozi di ultima visita memorizzati su Firebase per le catene
+  async function syncGroupsWithFirebaseVisits(groups) {
+    try {
+      const fbStats = await KarmaAPI.getFirebaseStats();
+      const chainVisits = (fbStats && fbStats.chainLastVisits) || {};
+      groups.forEach(g => {
+        const cv = chainVisits[String(g.id)];
+        if (cv && cv.date) {
+          g.lastVisitDate = KarmaAPI.formatItalianDate(cv.date);
+          if (cv.shop) g.lastVisitShop = cv.shop;
+        }
+      });
+    } catch (e) {
+      console.warn("Errore sync catene Firebase:", e);
+    }
+  }
+
+  // Sincronizza le date e ricalcola i giorni trascorsi dalla visita memorizzata su Firebase
+  async function syncShopsWithFirebaseVisits(shops) {
+    try {
+      const fbStats = await KarmaAPI.getFirebaseStats();
+      const fbShopVisits = (fbStats && fbStats.shopVisits) || {};
+      const localVisits = JSON.parse(localStorage.getItem('karma_shop_visits') || '{}');
+      const allVisits = { ...localVisits, ...fbShopVisits };
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      shops.forEach(s => {
+        const v = allVisits[String(s.id)];
+        if (v && v.date) {
+          s.lastVisit = KarmaAPI.formatItalianDate(v.date);
+          s.lastVisitRaw = v.date;
+
+          const vDate = new Date(v.date + 'T00:00:00');
+          if (!isNaN(vDate.getTime())) {
+            const diffMs = today - vDate;
+            const diffDays = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+            s.averageDays = (diffDays === 0) ? 'Oggi (0 gg)' : `${diffDays} gg`;
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("Errore sync negozi Firebase:", e);
     }
   }
 
@@ -237,6 +285,7 @@ const AppRouter = (function() {
         return;
       }
 
+      await syncShopsWithFirebaseVisits(res.shops);
       state.shops = res.shops;
       state.filteredShops = [...res.shops];
       sortShops(state.currentSort);
@@ -380,7 +429,6 @@ const AppRouter = (function() {
     document.getElementById('progressCountLabel').innerHTML = `<strong>${completed}</strong> di ${total} (${percent}%)`;
     document.getElementById('progressFillBar').style.width = percent + '%';
     
-    const statusBadge = document.getElementById('pvProgressStatusBadge');
     const verificationBox = document.getElementById('visitVerificationBox');
     const chkCartellini = document.getElementById('chkCartellini');
     const chkRiparazioni = document.getElementById('chkRiparazioni');
@@ -388,20 +436,10 @@ const AppRouter = (function() {
 
     // Se tutte le fotografie sono state scattate
     if (total > 0 && completed === total) {
-      if (statusBadge) {
-        statusBadge.textContent = '✓ Allestimento Verificato';
-        statusBadge.style.background = 'var(--success-bg)';
-        statusBadge.style.color = 'var(--success-text)';
-      }
       if (verificationBox) {
         verificationBox.style.display = 'block';
       }
     } else {
-      if (statusBadge) {
-        statusBadge.textContent = 'In Rilevazione';
-        statusBadge.style.background = '#EFF6FF';
-        statusBadge.style.color = '#2563EB';
-      }
       if (verificationBox) {
         verificationBox.style.display = 'none';
       }
@@ -576,6 +614,20 @@ const AppRouter = (function() {
 
       await KarmaAPI.saveInspection(visitPayload);
 
+      const todayIso = new Date().toISOString().split('T')[0];
+      // Memorizza data ultima visita per negozio per aggiornamento immediato della UI
+      const localVisits = JSON.parse(localStorage.getItem('karma_shop_visits') || '{}');
+      localVisits[String(shop.id)] = {
+        shopId: String(shop.id),
+        shop: shop.name,
+        groupId: String(shop.groupId),
+        chain: group ? group.name : '',
+        date: todayIso,
+        timestamp: new Date().toISOString(),
+        agent: state.currentUser || 'Agente'
+      };
+      localStorage.setItem('karma_shop_visits', JSON.stringify(localVisits));
+
       // Memorizza localmente per feedback immediato
       const completed = JSON.parse(localStorage.getItem('karma_completed_visits') || '[]');
       if (!completed.includes(String(shop.id))) {
@@ -743,10 +795,34 @@ const AppRouter = (function() {
     // Carica dati reali da Firebase
     try {
       const fbStats = await KarmaAPI.getFirebaseStats();
-      const fbCountEl = document.getElementById('statsKpiFirebasePhotos');
-      if (fbCountEl) {
-        fbCountEl.textContent = fbStats.totalInspections || 0;
+      const fbPhotosEl = document.getElementById('statsKpiFirebasePhotos');
+      if (fbPhotosEl) {
+        fbPhotosEl.textContent = fbStats.totalInspections || 0;
       }
+      const fbVisitsEl = document.getElementById('statsKpiFirebaseVisits');
+      if (fbVisitsEl) {
+        fbVisitsEl.textContent = fbStats.totalVisits || 0;
+      }
+
+      // Aggiorna la tabella delle catene con le date e negozi memorizzati su Firebase
+      const chainVisits = (fbStats && fbStats.chainLastVisits) || {};
+      tbody.innerHTML = '';
+      state.groups.forEach(g => {
+        const cv = chainVisits[String(g.id)];
+        const displayDate = (cv && cv.date) ? KarmaAPI.formatItalianDate(cv.date) : (g.lastVisitDate || '--');
+        const displayShop = (cv && cv.shop) ? cv.shop : (g.lastVisitShop || '');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(g.name)}</strong></td>
+          <td class="text-center"><span class="badge-pill-dark">${escapeHtml(g.shopsCount || '0 PV')}</span></td>
+          <td>
+            ${escapeHtml(displayDate)}
+            ${displayShop ? `<br><small style="color:var(--primary); font-weight:700;">${escapeHtml(displayShop)}</small>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
 
       const recentListEl = document.getElementById('statsRecentInspectionsList');
       if (recentListEl) {

@@ -1374,6 +1374,17 @@ body {
   gap: 8px;
 }
 
+.stats-kpi-row.stats-kpi-4 {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: 600px) {
+  .stats-kpi-row.stats-kpi-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .kpi-card.kpi-firebase {
   background: #FFFBEB;
   border-color: #FDE68A;

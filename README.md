@@ -1,4 +1,4 @@
-# WebApp Karma Espositori (WCAM 2.5) - Edizione Vercel / Firebase
+# WebApp Karma Espositori (WCAM 2.6) - Edizione Vercel / Firebase
 
 Applicazione web progressiva (PWA / Mobile-First SPA) sviluppata per **Karma Italiana Srl** per la rilevazione fotografica e la verifica dell'allestimento espositori nei punti vendita da parte degli agenti.
 

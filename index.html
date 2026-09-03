@@ -79,7 +79,7 @@
         </form>
 
         <div class="auth-footer">
-          <p>&copy; 2026 Karma Italiana Srl &bull; WCAM <span class="app-version-val">v2.5</span></p>
+          <p>&copy; 2026 Karma Italiana Srl &bull; WCAM <span class="app-version-val">v2.6</span></p>
         </div>
       </div>
     </div>
@@ -147,7 +147,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.5</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.6</span>
       </footer>
     </div>
   </section>
@@ -200,7 +200,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.5</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.6</span>
       </footer>
     </div>
   </section>
@@ -211,8 +211,7 @@
   <section id="viewExhibitors" class="view-screen">
     <div class="main-container">
       <div class="pv-summary-card">
-        <div class="pv-meta-top">
-          <span class="pv-badge-status" id="pvProgressStatusBadge">In Rilevazione</span>
+        <div class="pv-meta-top" style="justify-content: flex-end;">
           <button type="button" class="btn-stock-quick" onclick="openStockModal()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -289,7 +288,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.5</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.6</span>
       </footer>
     </div>
   </section>
@@ -301,6 +300,41 @@
     <!-- Inputs per fotocamera nativa dello smartphone (100% compatibilità browser mobile) -->
     <input type="file" id="cameraNativeFileInput" accept="image/*" capture="environment" class="sr-only" onchange="handleFileCapture(event)">
     <input type="file" id="cameraGalleryFileInput" accept="image/*" class="sr-only" onchange="handleFileCapture(event)">
+
+    <!-- Top Bar Fotocamera (Posizionata in alto con tasto Indietro, nome negozio e 2 tasti azioni) -->
+    <header class="camera-top-bar">
+      <button type="button" class="cam-nav-btn" onclick="closeCamera()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Indietro</span>
+      </button>
+
+      <div class="cam-target-info">
+        <span class="cam-target-pv" id="cameraTargetPvLabel">PV Verona</span>
+        <h2 class="cam-target-name" id="cameraTargetExTitle">Staffe TV</h2>
+      </div>
+
+      <div class="cam-quick-actions">
+        <!-- Tasto Ghost Planigramma Live -->
+        <button type="button" id="btnLiveGhost" class="cam-icon-btn active-state" title="Sovrapponi Planigramma Guida" onclick="toggleLiveGhost()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </button>
+
+        <!-- Switch Fotocamera (Fronte/Retro) -->
+        <button type="button" id="btnSwitchCam" class="cam-icon-btn" title="Cambia Fotocamera" onclick="switchCameraFeed()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path>
+            <polyline points="16 2 21 7 16 12"></polyline>
+            <path d="M21 7H9"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
 
     <!-- Stream Video Live (se supportato da browser/HTTPS) -->
     <video id="liveVideoFeed" playsinline autoplay muted class="camera-video-feed"></video>
@@ -337,41 +371,6 @@
     <div id="ghostOverlayWrapper" class="ghost-overlay-wrapper" style="display: none;">
       <img id="ghostOverlayImg" src="" alt="Planigramma Guida" class="ghost-image">
     </div>
-
-    <!-- Top Bar Fotocamera -->
-    <header class="camera-top-bar">
-      <button type="button" class="cam-nav-btn" onclick="closeCamera()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-        <span>Indietro</span>
-      </button>
-
-      <div class="cam-target-info">
-        <span class="cam-target-pv" id="cameraTargetPvLabel">PV Verona</span>
-        <h2 class="cam-target-name" id="cameraTargetExTitle">Staffe TV</h2>
-      </div>
-
-      <div class="cam-quick-actions">
-        <!-- Tasto Ghost Planigramma Live -->
-        <button type="button" id="btnLiveGhost" class="cam-icon-btn active-state" title="Sovrapponi Planigramma Guida" onclick="toggleLiveGhost()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <polyline points="21 15 16 10 5 21"></polyline>
-          </svg>
-        </button>
-
-        <!-- Switch Fotocamera (Fronte/Retro) -->
-        <button type="button" id="btnSwitchCam" class="cam-icon-btn" title="Cambia Fotocamera" onclick="switchCameraFeed()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"></path>
-            <polyline points="16 2 21 7 16 12"></polyline>
-            <path d="M21 7H9"></path>
-          </svg>
-        </button>
-      </div>
-    </header>
 
     <!-- Slider Trasparenza Planigramma Live -->
     <div id="liveGhostSliderBar" class="ghost-slider-container" style="display: none;">
@@ -566,7 +565,7 @@
         <button type="button" class="btn-close-modal" onclick="closeStatsModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="stats-kpi-row stats-kpi-3">
+        <div class="stats-kpi-row stats-kpi-4">
           <div class="kpi-card">
             <span class="kpi-num" id="statsKpiGroups">0</span>
             <span class="kpi-title">Catene Assegnate</span>
@@ -576,8 +575,12 @@
             <span class="kpi-title">PV Totali</span>
           </div>
           <div class="kpi-card kpi-firebase">
+            <span class="kpi-num" id="statsKpiFirebaseVisits">0</span>
+            <span class="kpi-title">Visite Firebase</span>
+          </div>
+          <div class="kpi-card kpi-firebase">
             <span class="kpi-num" id="statsKpiFirebasePhotos">0</span>
-            <span class="kpi-title">Foto su Firebase</span>
+            <span class="kpi-title">Foto Firebase</span>
           </div>
         </div>
 

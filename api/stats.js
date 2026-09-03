@@ -31,39 +31,111 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/inspections?pageSize=100&key=${FIREBASE_CONFIG.apiKey}`;
+    const inspectionsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/inspections?pageSize=100&key=${FIREBASE_CONFIG.apiKey}`;
+    const visitsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/visits?pageSize=100&key=${FIREBASE_CONFIG.apiKey}`;
+    const shopVisitsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/shop_visits?pageSize=100&key=${FIREBASE_CONFIG.apiKey}`;
 
-    const resp = await httpsGet(firestoreUrl);
-    if (resp.status !== 200) {
-      return res.status(200).json({
-        totalInspections: 0,
-        recentInspections: [],
-        inspectionsByChain: {},
-        inspectionsByAgent: {}
+    const [respInspections, respVisits, respShopVisits] = await Promise.all([
+      httpsGet(inspectionsUrl).catch(() => ({ status: 500 })),
+      httpsGet(visitsUrl).catch(() => ({ status: 500 })),
+      httpsGet(shopVisitsUrl).catch(() => ({ status: 500 }))
+    ]);
+
+    // 1. Scatti fotografici
+    let inspections = [];
+    if (respInspections.status === 200) {
+      const data = JSON.parse(respInspections.body || '{}');
+      const rawDocs = data.documents || [];
+      inspections = rawDocs.map(doc => {
+        const f = doc.fields || {};
+        const id = doc.name ? doc.name.split('/').pop() : '';
+        return {
+          id,
+          agent: f.agent?.stringValue || 'Agente',
+          chain: f.chain?.stringValue || 'Catena',
+          shop: f.shop?.stringValue || 'Punto Vendita',
+          shopId: f.shopId?.stringValue || '',
+          groupId: f.groupId?.stringValue || '',
+          exTitle: f.exTitle?.stringValue || 'Espositore',
+          timestamp: f.timestamp?.timestampValue || f.timestamp?.stringValue || '',
+          date: f.date?.stringValue || '',
+          photoUrl: f.photoUrl?.stringValue || f.photoBase64?.stringValue || null
+        };
+      });
+      inspections.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+    }
+
+    // 2. Visite completate
+    let visits = [];
+    if (respVisits.status === 200) {
+      const data = JSON.parse(respVisits.body || '{}');
+      const rawDocs = data.documents || [];
+      visits = rawDocs.map(doc => {
+        const f = doc.fields || {};
+        const id = doc.name ? doc.name.split('/').pop() : '';
+        return {
+          id,
+          agent: f.agent?.stringValue || 'Agente',
+          chain: f.chain?.stringValue || 'Catena',
+          shop: f.shop?.stringValue || 'Punto Vendita',
+          shopId: f.shopId?.stringValue || '',
+          groupId: f.groupId?.stringValue || '',
+          cartellini: !!f.cartellini?.booleanValue,
+          riparazioni: !!f.riparazioni?.booleanValue,
+          timestamp: f.timestamp?.timestampValue || f.timestamp?.stringValue || '',
+          date: f.date?.stringValue || ''
+        };
+      });
+      visits.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+    }
+
+    // 3. Mappa date ultima visita per Punto Vendita e Catena
+    const shopVisits = {};
+    const chainLastVisits = {};
+
+    if (respShopVisits.status === 200) {
+      const data = JSON.parse(respShopVisits.body || '{}');
+      const rawDocs = data.documents || [];
+      rawDocs.forEach(doc => {
+        const f = doc.fields || {};
+        const sId = f.shopId?.stringValue || (doc.name ? doc.name.split('/').pop() : '');
+        if (sId) {
+          shopVisits[sId] = {
+            shopId: sId,
+            shop: f.shop?.stringValue || '',
+            chain: f.chain?.stringValue || '',
+            groupId: f.groupId?.stringValue || '',
+            date: f.date?.stringValue || '',
+            timestamp: f.timestamp?.timestampValue || f.timestamp?.stringValue || '',
+            agent: f.agent?.stringValue || ''
+          };
+        }
       });
     }
 
-    const data = JSON.parse(resp.body);
-    const rawDocs = data.documents || [];
-
-    const inspections = rawDocs.map(doc => {
-      const f = doc.fields || {};
-      const id = doc.name ? doc.name.split('/').pop() : '';
-      return {
-        id,
-        agent: f.agent?.stringValue || 'Agente',
-        chain: f.chain?.stringValue || 'Catena',
-        shop: f.shop?.stringValue || 'Punto Vendita',
-        exTitle: f.exTitle?.stringValue || 'Espositore',
-        timestamp: f.timestamp?.timestampValue || f.timestamp?.stringValue || '',
-        date: f.date?.stringValue || '',
-        photoUrl: f.photoUrl?.stringValue || f.photoBase64?.stringValue || null,
-        notes: f.notes?.stringValue || ''
-      };
+    // Integra con visite storiche
+    visits.forEach(v => {
+      if (v.shopId && (!shopVisits[v.shopId] || new Date(v.timestamp) > new Date(shopVisits[v.shopId].timestamp || 0))) {
+        shopVisits[v.shopId] = {
+          shopId: v.shopId,
+          shop: v.shop,
+          chain: v.chain,
+          groupId: v.groupId,
+          date: v.date,
+          timestamp: v.timestamp,
+          agent: v.agent
+        };
+      }
+      if (v.groupId && (!chainLastVisits[v.groupId] || new Date(v.timestamp) > new Date(chainLastVisits[v.groupId].timestamp || 0))) {
+        chainLastVisits[v.groupId] = {
+          groupId: v.groupId,
+          chain: v.chain,
+          shop: v.shop,
+          date: v.date,
+          timestamp: v.timestamp
+        };
+      }
     });
-
-    // Ordina per timestamp decrescente
-    inspections.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
 
     const inspectionsByChain = {};
     const inspectionsByAgent = {};
@@ -73,21 +145,13 @@ module.exports = async (req, res) => {
       inspectionsByAgent[it.agent] = (inspectionsByAgent[it.agent] || 0) + 1;
     });
 
-    // Ultimi 10 scatti con foto miniatura
-    const recentInspections = inspections.slice(0, 10).map(it => ({
-      id: it.id,
-      agent: it.agent,
-      chain: it.chain,
-      shop: it.shop,
-      exTitle: it.exTitle,
-      timestamp: it.timestamp,
-      date: it.date,
-      photoUrl: it.photoUrl
-    }));
-
     return res.status(200).json({
       totalInspections: inspections.length,
-      recentInspections,
+      totalVisits: visits.length,
+      recentInspections: inspections.slice(0, 10),
+      recentVisits: visits.slice(0, 10),
+      shopVisits,
+      chainLastVisits,
       inspectionsByChain,
       inspectionsByAgent
     });

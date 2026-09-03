@@ -122,10 +122,18 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
                 fs_req = urllib.request.Request(fs_url, data=fs_body, headers={'Content-Type': 'application/json'})
                 with urllib.request.urlopen(fs_req, timeout=10) as fs_resp:
                     pass
+
+                # Aggiorna documento per negozio in 'shop_visits'
+                shop_id = payload.get('shopId')
+                if shop_id:
+                    sv_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/shop_visits/{shop_id}?key={api_key}"
+                    sv_req = urllib.request.Request(sv_url, data=fs_body, headers={'Content-Type': 'application/json'}, method='PATCH')
+                    with urllib.request.urlopen(sv_req, timeout=10) as sv_resp:
+                        pass
             except Exception as ex:
                 print("Errore salvataggio visita Firestore:", ex)
 
-            resp_payload = json.dumps({'success': True, 'type': 'visit_completed', 'timestamp': timestamp}).encode('utf-8')
+            resp_payload = json.dumps({'success': True, 'type': 'visit_completed', 'date': date_str, 'timestamp': timestamp}).encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -221,9 +229,14 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
         api_key = os.environ.get("FIREBASE_API_KEY", "AIzaSyAEROCv8lYbMaxDVhg4u4kcfjGPO2UZL2M")
         project_id = os.environ.get("FIREBASE_PROJECT_ID", "app-create-con-ai")
 
-        fs_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/inspections?pageSize=100&key={api_key}"
         inspections = []
+        visits = []
+        shop_visits = {}
+        chain_last_visits = {}
+
+        # 1. Recupera inspections
         try:
+            fs_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/inspections?pageSize=100&key={api_key}"
             req = urllib.request.Request(fs_url)
             with urllib.request.urlopen(req, timeout=10) as r:
                 data = json.loads(r.read().decode('utf-8'))
@@ -234,16 +247,86 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
                         'agent': f.get('agent', {}).get('stringValue', 'Agente'),
                         'chain': f.get('chain', {}).get('stringValue', 'Catena'),
                         'shop': f.get('shop', {}).get('stringValue', 'Punto Vendita'),
+                        'shopId': f.get('shopId', {}).get('stringValue', ''),
+                        'groupId': f.get('groupId', {}).get('stringValue', ''),
                         'exTitle': f.get('exTitle', {}).get('stringValue', 'Espositore'),
                         'timestamp': f.get('timestamp', {}).get('timestampValue', ''),
                         'date': f.get('date', {}).get('stringValue', ''),
-                        'photoUrl': f.get('photoUrl', {}).get('stringValue') or f.get('photoBase64', {}).get('stringValue'),
-                        'notes': f.get('notes', {}).get('stringValue', '')
+                        'photoUrl': f.get('photoUrl', {}).get('stringValue') or f.get('photoBase64', {}).get('stringValue')
                     })
         except Exception as ex:
-            print("Errore lettura Firestore per statistiche:", ex)
+            print("Errore lettura inspections Firestore:", ex)
+
+        # 2. Recupera visits
+        try:
+            visits_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/visits?pageSize=100&key={api_key}"
+            req_v = urllib.request.Request(visits_url)
+            with urllib.request.urlopen(req_v, timeout=10) as r_v:
+                data_v = json.loads(r_v.read().decode('utf-8'))
+                for doc in data_v.get('documents', []):
+                    f = doc.get('fields', {})
+                    visits.append({
+                        'id': doc.get('name', '').split('/')[-1],
+                        'agent': f.get('agent', {}).get('stringValue', 'Agente'),
+                        'chain': f.get('chain', {}).get('stringValue', 'Catena'),
+                        'shop': f.get('shop', {}).get('stringValue', 'Punto Vendita'),
+                        'shopId': f.get('shopId', {}).get('stringValue', ''),
+                        'groupId': f.get('groupId', {}).get('stringValue', ''),
+                        'cartellini': f.get('cartellini', {}).get('booleanValue', False),
+                        'riparazioni': f.get('riparazioni', {}).get('booleanValue', False),
+                        'timestamp': f.get('timestamp', {}).get('timestampValue', ''),
+                        'date': f.get('date', {}).get('stringValue', '')
+                    })
+        except Exception as ex:
+            print("Errore lettura visits Firestore:", ex)
+
+        # 3. Recupera shop_visits
+        try:
+            sv_url = f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/shop_visits?pageSize=100&key={api_key}"
+            req_sv = urllib.request.Request(sv_url)
+            with urllib.request.urlopen(req_sv, timeout=10) as r_sv:
+                data_sv = json.loads(r_sv.read().decode('utf-8'))
+                for doc in data_sv.get('documents', []):
+                    f = doc.get('fields', {})
+                    s_id = f.get('shopId', {}).get('stringValue') or doc.get('name', '').split('/')[-1]
+                    if s_id:
+                        shop_visits[s_id] = {
+                            'shopId': s_id,
+                            'shop': f.get('shop', {}).get('stringValue', ''),
+                            'chain': f.get('chain', {}).get('stringValue', ''),
+                            'groupId': f.get('groupId', {}).get('stringValue', ''),
+                            'date': f.get('date', {}).get('stringValue', ''),
+                            'timestamp': f.get('timestamp', {}).get('timestampValue', ''),
+                            'agent': f.get('agent', {}).get('stringValue', '')
+                        }
+        except Exception as ex:
+            pass
+
+        # Integra da visits
+        for v in visits:
+            s_id = v.get('shopId')
+            if s_id and (s_id not in shop_visits or v.get('timestamp', '') > shop_visits[s_id].get('timestamp', '')):
+                shop_visits[s_id] = {
+                    'shopId': s_id,
+                    'shop': v.get('shop', ''),
+                    'chain': v.get('chain', ''),
+                    'groupId': v.get('groupId', ''),
+                    'date': v.get('date', ''),
+                    'timestamp': v.get('timestamp', ''),
+                    'agent': v.get('agent', '')
+                }
+            g_id = v.get('groupId')
+            if g_id and (g_id not in chain_last_visits or v.get('timestamp', '') > chain_last_visits[g_id].get('timestamp', '')):
+                chain_last_visits[g_id] = {
+                    'groupId': g_id,
+                    'chain': v.get('chain', ''),
+                    'shop': v.get('shop', ''),
+                    'date': v.get('date', ''),
+                    'timestamp': v.get('timestamp', '')
+                }
 
         inspections.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+        visits.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
 
         by_chain = {}
         by_agent = {}
@@ -251,11 +334,13 @@ class VercelDevProxyHandler(http.server.SimpleHTTPRequestHandler):
             by_chain[it['chain']] = by_chain.get(it['chain'], 0) + 1
             by_agent[it['agent']] = by_agent.get(it['agent'], 0) + 1
 
-        recent = inspections[:10]
-
         resp_body = json.dumps({
             'totalInspections': len(inspections),
-            'recentInspections': recent,
+            'totalVisits': len(visits),
+            'recentInspections': inspections[:10],
+            'recentVisits': visits[:10],
+            'shopVisits': shop_visits,
+            'chainLastVisits': chain_last_visits,
             'inspectionsByChain': by_chain,
             'inspectionsByAgent': by_agent
         }).encode('utf-8')

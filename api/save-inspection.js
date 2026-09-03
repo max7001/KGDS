@@ -73,12 +73,22 @@ module.exports = async (req, res) => {
         status: { stringValue: 'visit_completed' }
       };
 
-      const firestoreRes = await httpsRequest(firestoreUrl, {
+      // 1. Log nella collezione 'visits'
+      await httpsRequest(firestoreUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       }, JSON.stringify({ fields: docFields }));
 
-      return res.status(200).json({ success: true, type: 'visit_completed', timestamp });
+      // 2. Aggiorna documento punto vendita in 'shop_visits'
+      if (shopId) {
+        const shopVisitUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents/shop_visits/${shopId}?key=${FIREBASE_CONFIG.apiKey}`;
+        await httpsRequest(shopVisitUrl, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' }
+        }, JSON.stringify({ fields: docFields }));
+      }
+
+      return res.status(200).json({ success: true, type: 'visit_completed', date: dateStr, timestamp });
     }
 
     let photoUrl = null;
