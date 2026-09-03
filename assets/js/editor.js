@@ -128,23 +128,38 @@ const EditorController = (function() {
       // 1. Compressione intelligente client-side prima del caricamento
       const compressedDataUrl = await compressImage(currentPhotoDataUrl);
 
-      // 2. Invio diretto al server di karmaitaliana.it/wcam
-      const success = await KarmaAPI.uploadPhoto(
-        currentContext.groupId,
-        currentContext.shopId,
-        currentContext.exId,
-        compressedDataUrl
-      );
+      // 2. Invio e salvataggio su Firebase (fotografia e record statistico)
+      const currentAgent = localStorage.getItem('karma_logged_user') || 'Agente';
+      const inspectionPayload = {
+        groupId: currentContext.groupId,
+        chain: currentContext.chainName || '',
+        shopId: currentContext.shopId,
+        shop: currentContext.shopName,
+        exId: currentContext.exId,
+        exTitle: currentContext.exTitle,
+        agent: currentAgent,
+        imageBase64: compressedDataUrl
+      };
+
+      const fbResult = await KarmaAPI.saveInspection(inspectionPayload);
+
+      // 3. Invio sincrono al database di karmaitaliana.it/wcam
+      try {
+        await KarmaAPI.uploadPhoto(
+          currentContext.groupId,
+          currentContext.shopId,
+          currentContext.exId,
+          compressedDataUrl
+        );
+      } catch (kErr) {
+        console.warn("Upload secondario karma:", kErr);
+      }
 
       spinnerOverlay.style.display = 'none';
 
-      if (success) {
-        closeStudio();
-        // Ricarica la vista degli espositori aggiornando lo stato in tempo reale
-        AppRouter.refreshExhibitors();
-      } else {
-        alert("Attenzione: il server ha risposto con un errore durante il salvataggio.");
-      }
+      closeStudio();
+      // Ricarica la vista degli espositori aggiornando lo stato in tempo reale
+      AppRouter.refreshExhibitors();
     } catch (err) {
       console.error("Errore durante l'upload:", err);
       spinnerOverlay.style.display = 'none';

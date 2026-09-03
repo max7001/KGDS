@@ -349,7 +349,42 @@ const KarmaAPI = (function() {
     return response.ok;
   }
 
-  // 7. LOGOUT
+  // 7. SALVATAGGIO FOTOGRAFIA E STATISTICHE SU FIREBASE (Sicuro via serverless API)
+  async function saveInspection(payload) {
+    try {
+      const response = await fetch('/api/save-inspection', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      return await response.json();
+    } catch (e) {
+      console.warn("Errore salvataggio Firebase:", e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  // 8. STATISTICHE GENERALI DA FIREBASE
+  async function getFirebaseStats() {
+    try {
+      const response = await fetch('/api/stats');
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn("Errore recupero statistiche Firebase:", e);
+    }
+    return {
+      totalInspections: 0,
+      recentInspections: [],
+      inspectionsByChain: {},
+      inspectionsByAgent: {}
+    };
+  }
+
+  // 9. LOGOUT
   async function logout() {
     localStorage.removeItem('karma_logged_user');
     await request('logout.php');
@@ -364,6 +399,8 @@ const KarmaAPI = (function() {
     getStock,
     getProductImage,
     uploadPhoto,
+    saveInspection,
+    getFirebaseStats,
     logout
   };
 })();

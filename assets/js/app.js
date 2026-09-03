@@ -3,7 +3,7 @@
  * Router SPA & Controller Principale (Deployable su Vercel)
  */
 
-const APP_VERSION = 'v2.1';
+const APP_VERSION = 'v2.2';
 
 const AppRouter = (function() {
   let state = {
@@ -435,6 +435,7 @@ const AppRouter = (function() {
   function startCamera(exId, exTitle, planImg, expImg) {
     CameraController.openCamera({
       groupId: state.selectedShop.groupId,
+      chainName: state.selectedGroup ? state.selectedGroup.name : '',
       shopId: state.selectedShop.id,
       exId: exId,
       exTitle: exTitle,
@@ -566,7 +567,7 @@ const AppRouter = (function() {
     document.getElementById('modalInstructionsView').style.display = 'none';
   }
 
-  function openStats() {
+  async function openStats() {
     document.getElementById('modalStatsView').style.display = 'flex';
     document.getElementById('statsKpiGroups').textContent = state.groups.length;
 
@@ -592,6 +593,46 @@ const AppRouter = (function() {
       `;
       tbody.appendChild(tr);
     });
+
+    // Carica dati reali da Firebase
+    try {
+      const fbStats = await KarmaAPI.getFirebaseStats();
+      const fbCountEl = document.getElementById('statsKpiFirebasePhotos');
+      if (fbCountEl) {
+        fbCountEl.textContent = fbStats.totalInspections || 0;
+      }
+
+      const recentListEl = document.getElementById('statsRecentInspectionsList');
+      if (recentListEl) {
+        recentListEl.innerHTML = '';
+        const recents = fbStats.recentInspections || [];
+        if (recents.length === 0) {
+          recentListEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.825rem; padding:8px;">Nessuna fotografia ancora memorizzata su Firebase.</p>';
+        } else {
+          recents.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'stats-recent-item';
+            card.innerHTML = `
+              ${item.photoUrl ? `
+                <div class="stats-recent-thumb" onclick="AppRouter.openGuide('Allestimento: ${escapeHtml(item.exTitle)}', '${item.photoUrl}')">
+                  <img src="${item.photoUrl}" alt="Foto" class="stats-thumb-img">
+                </div>
+              ` : `
+                <div class="stats-recent-thumb-empty">📸</div>
+              `}
+              <div class="stats-recent-info">
+                <span class="stats-recent-title">${escapeHtml(item.exTitle)}</span>
+                <span class="stats-recent-meta">${escapeHtml(item.shop)} (${escapeHtml(item.chain)})</span>
+                <small class="stats-recent-date">${escapeHtml(item.date || '')} &bull; ${escapeHtml(item.agent)}</small>
+              </div>
+            `;
+            recentListEl.appendChild(card);
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Errore caricamento statistiche Firebase:", e);
+    }
   }
 
   function closeStats() {

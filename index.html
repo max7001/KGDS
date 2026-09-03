@@ -79,7 +79,7 @@
         </form>
 
         <div class="auth-footer">
-          <p>&copy; 2026 Karma Italiana Srl &bull; WCAM <span class="app-version-val">v2.1</span></p>
+          <p>&copy; 2026 Karma Italiana Srl &bull; WCAM <span class="app-version-val">v2.2</span></p>
         </div>
       </div>
     </div>
@@ -152,7 +152,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.1</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.2</span>
       </footer>
     </div>
   </section>
@@ -205,7 +205,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.1</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.2</span>
       </footer>
     </div>
   </section>
@@ -251,7 +251,7 @@
 
       <!-- Footer Versione App -->
       <footer class="app-version-footer">
-        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.1</span>
+        <span>Karma WCAM</span> &bull; <span class="version-tag app-version-val">v2.2</span>
       </footer>
     </div>
   </section>
@@ -528,19 +528,23 @@
         <button type="button" class="btn-close-modal" onclick="closeStatsModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="stats-kpi-row">
+        <div class="stats-kpi-row stats-kpi-3">
           <div class="kpi-card">
             <span class="kpi-num" id="statsKpiGroups">0</span>
             <span class="kpi-title">Catene Assegnate</span>
           </div>
           <div class="kpi-card">
             <span class="kpi-num" id="statsKpiShops">0</span>
-            <span class="kpi-title">Punti Vendita Totali</span>
+            <span class="kpi-title">PV Totali</span>
+          </div>
+          <div class="kpi-card kpi-firebase">
+            <span class="kpi-num" id="statsKpiFirebasePhotos">0</span>
+            <span class="kpi-title">Foto su Firebase</span>
           </div>
         </div>
 
         <h4 class="stats-section-title">Riepilogo per Catena Retail</h4>
-        <div class="table-responsive">
+        <div class="table-responsive" style="margin-bottom: 20px;">
           <table class="stock-table">
             <thead>
               <tr>
@@ -551,6 +555,11 @@
             </thead>
             <tbody id="statsTableBody"></tbody>
           </table>
+        </div>
+
+        <h4 class="stats-section-title">Ultimi Allestimenti Rilevati su Firebase</h4>
+        <div id="statsRecentInspectionsList" class="stats-recent-grid">
+          <p style="color:var(--text-muted); font-size:0.825rem; padding:8px;">Caricamento fotografie da Firebase...</p>
         </div>
       </div>
       <div class="modal-footer">
